@@ -1,5 +1,12 @@
 ---
+security:
+  - bearerAuth: []
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
   examples: {}
   headers: {}
   parameters: {}
@@ -10,6 +17,7 @@ components:
       description: |-
         The service receiving your data (e.g. Salesforce, Hubspot, Customer.io, or a
         SFTP server)
+      x-speakeasy-entity: Destination
       properties:
         id:
           type: string
@@ -158,6 +166,7 @@ components:
       description: |-
         The database or warehouse where your data is stored. The starting point for
         a Hightouch data pipeline.
+      x-speakeasy-entity: Source
       properties:
         id:
           type: string
@@ -262,6 +271,7 @@ components:
       description: |-
         The SQL query that pulls data from your source to send to your destination.
         We send your SQL query directly to your source so any SQL that is valid for your source (including functions) is valid in Hightouch.
+      x-speakeasy-entity: Model
       properties:
         id:
           type: string
@@ -1058,11 +1068,6 @@ components:
       type: object
       description: The input of a trigger action to run syncs based on sync ID, slug
         or other filters
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: Bearer
 info:
   title: Hightouch API
   version: 1.0.0
@@ -1073,7 +1078,7 @@ info:
     url: https://hightouch.com
 openapi: 3.0.0
 paths:
-  "/destinations/{destinationId}":
+  "/destinations/{id}":
     get:
       operationId: GetDestination
       responses:
@@ -1105,18 +1110,16 @@ paths:
           description: Not found
       description: Retrieve a destination based on its Hightouch ID
       summary: Get Destination
-      security:
-      - bearerAuth: []
       parameters:
       - description: The destination's ID
         in: path
-        name: destinationId
+        name: id
         required: true
         schema:
-          format: double
-          type: number
+          type: string
     patch:
       operationId: UpdateDestination
+      x-speakeasy-entity-operation: Destination#update
       responses:
         '200':
           description: Ok
@@ -1162,16 +1165,13 @@ paths:
 
         Patch a destination based on its Hightouch ID
       summary: Update Destination
-      security:
-      - bearerAuth: []
       parameters:
       - description: The destination's ID
         in: path
-        name: destinationId
+        name: id
         required: true
         schema:
-          format: double
-          type: number
+          type: string
       requestBody:
         required: true
         content:
@@ -1243,8 +1243,6 @@ paths:
                 "$ref": "#/components/schemas/ValidateErrorJSON"
       description: List the destinations in the user's workspace
       summary: List Destinations
-      security:
-      - bearerAuth: []
       parameters:
       - description: Filter based on the destination's name
         in: query
@@ -1289,6 +1287,7 @@ paths:
           - updatedAt
     post:
       operationId: CreateDestination
+      x-speakeasy-entity-operation: Destination#create
       responses:
         '200':
           description: Ok
@@ -1335,8 +1334,6 @@ paths:
                 "$ref": "#/components/schemas/InternalServerError"
       description: Create a new destination
       summary: Create Destination
-      security:
-      - bearerAuth: []
       parameters: []
       requestBody:
         required: true
@@ -1371,8 +1368,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ValidateErrorJSON"
-      security:
-      - bearerAuth: []
       parameters:
       - in: path
         name: graphId
@@ -1385,7 +1380,7 @@ paths:
           application/json:
             schema:
               "$ref": "#/components/schemas/TriggerRunIdGraphInput"
-  "/sources/{sourceId}":
+  "/sources/{id}":
     get:
       operationId: GetSource
       responses:
@@ -1420,18 +1415,17 @@ paths:
                 "$ref": "#/components/schemas/ValidateErrorJSON"
       description: Retrieve source from source ID
       summary: Get Source
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The id of the source
         in: path
-        name: sourceId
+        name: id
         required: true
         schema:
-          format: double
-          type: number
+          type: string
     patch:
       operationId: UpdateSource
+      x-speakeasy-entity-operation: Source#update
       responses:
         '200':
           description: Ok
@@ -1478,16 +1472,14 @@ paths:
 
         Patch a source based on its Hightouch ID
       summary: Update Source
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The source's ID
         in: path
-        name: sourceId
+        name: id
         required: true
         schema:
-          format: double
-          type: number
+          type: string
       requestBody:
         required: true
         content:
@@ -1546,8 +1538,7 @@ paths:
           description: Unauthorized
       description: List all the sources in the current workspace
       summary: List Sources
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: filter based on name
         in: query
@@ -1640,8 +1631,7 @@ paths:
                 "$ref": "#/components/schemas/InternalServerError"
       description: Create a new source
       summary: Create Source
-      security:
-      - bearerAuth: []
+
       parameters: []
       requestBody:
         required: true
@@ -1695,18 +1685,17 @@ paths:
           description: Not found
       description: Retrieve models from model ID
       summary: Get Model
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The id of the model
         in: path
         name: modelId
         required: true
         schema:
-          format: double
-          type: number
+          type: string
     patch:
       operationId: UpdateModel
+      x-speakeasy-entity-operation: Model#update
       responses:
         '200':
           description: Ok
@@ -1758,16 +1747,14 @@ paths:
 
         Patch a model based on its Hightouch ID
       summary: Update Model
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The model's ID
         in: path
         name: modelId
         required: true
         schema:
-          format: double
-          type: number
+          type: string
       requestBody:
         required: true
         content:
@@ -1848,8 +1835,7 @@ paths:
       description: List all the models in the current workspace including parent and
         related models
       summary: List Models
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: filter based on name
         in: query
@@ -1944,8 +1930,7 @@ paths:
                 "$ref": "#/components/schemas/InternalServerError"
       description: Create a new model
       summary: Create Model
-      security:
-      - bearerAuth: []
+
       parameters: []
       requestBody:
         required: true
@@ -1962,7 +1947,7 @@ paths:
               isSchema: false
               raw:
                 sql: select id, last_name from users
-  "/syncs/{syncId}":
+  "/syncs/{id}":
     get:
       operationId: GetSync
       responses:
@@ -2017,18 +2002,17 @@ paths:
           description: Not found
       description: Retrieve sync from sync ID
       summary: Get Sync
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The id of the sync
         in: path
-        name: syncId
+        name: id
         required: true
         schema:
-          format: double
-          type: number
+          type: string
     patch:
       operationId: UpdateSync
+      x-speakeasy-entity-operation: Sync#update
       responses:
         '200':
           description: Ok
@@ -2096,16 +2080,14 @@ paths:
 
         Patch a sync based on its Hightouch ID
       summary: Update Sync
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The sync's ID
         in: path
-        name: syncId
+        name: id
         required: true
         schema:
-          format: double
-          type: number
+          type: string
       requestBody:
         required: true
         content:
@@ -2201,8 +2183,7 @@ paths:
                 "$ref": "#/components/schemas/ValidateErrorJSON"
       description: List all the syncs in the current workspace
       summary: List Syncs
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: filter based on slug
         in: query
@@ -2331,8 +2312,7 @@ paths:
                 "$ref": "#/components/schemas/InternalServerError"
       description: Create a new sync
       summary: Create Sync
-      security:
-      - bearerAuth: []
+
       parameters: []
       requestBody:
         required: true
@@ -2436,15 +2416,13 @@ paths:
                 "$ref": "#/components/schemas/ValidateErrorJSON"
       description: List all sync runs under a sync
       summary: List Sync Runs
-      security:
-      - bearerAuth: []
+
       parameters:
       - in: path
         name: syncId
         required: true
         schema:
-          format: double
-          type: number
+          type: string
       - description: query for specific run id
         in: query
         name: runId
@@ -2527,8 +2505,7 @@ paths:
         If a run is already in progress, this queues a sync run that will get
         executed immediately after the current run completes.
       summary: Trigger Sync
-      security:
-      - bearerAuth: []
+
       parameters:
       - description: The id of the sync to trigger a run
         in: path
@@ -2570,8 +2547,7 @@ paths:
         If a run is already in progress, this queues a sync run that will get
         executed immediately after the current run completes.
       summary: Trigger Sync From ID or Slug
-      security:
-      - bearerAuth: []
+
       parameters: []
       requestBody:
         required: true
