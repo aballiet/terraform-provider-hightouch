@@ -1,0 +1,18 @@
+configVersion: 1.0.1
+management:
+  docChecksum: f9e4916f5224f36a702df791dcda1286
+  docVersion: 1.0.0
+  speakeasyVersion: 1.65.2
+  generationVersion: 2.75.1
+generation:
+  comments:
+    disableComments: false
+    omitDescriptionIfSummaryPresent: false
+  baseServerURL: ""
+  sdkClassName: hightouch
+  singleTagPerOp: false
+  tagNamespacingDisabled: false
+terraform:
+  version: 0.0.1
+  author: aballiet
+  packageName: hightouch
