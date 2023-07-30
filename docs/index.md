@@ -3,9 +3,9 @@
 page_title: "aballiet-terraform-provider-hightouch-oss Provider"
 subcategory: ""
 description: |-
-Hightouch exposes a REST API that lets users interact with resources like syncs, models, sources and destinations. Though the REST API is open to all Hightouch users, we aim to build features so you don't need to rely on it directly. For example, Git Sync lets you manage orchestration programmatically.
-If you're looking to create a custom destination, it's best to use the HTTP Request destination as your base. If you find you still need to use the REST API directly,  about your use case.
-To start using the API, you must first create and retrieve an API key from your workspace.
+  Hightouch exposes a REST API that lets users interact with resources like syncs, models, sources and destinations. Though the REST API is open to all Hightouch users, we aim to build features so you don't need to rely on it directly. For example, Git Sync lets you manage orchestration programmatically.
+  If you're looking to create a custom destination, it's best to use the HTTP Request destination as your base. If you find you still need to use the REST API directly,  about your use case.
+  To start using the API, you must first create and retrieve an API key from your workspace.
 ---
 
 # aballiet-terraform-provider-hightouch Provider
