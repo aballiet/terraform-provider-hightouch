@@ -134,7 +134,7 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 			"schedule": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
-					"schedule": schema.StringAttribute{
+					"schedule": schema.SingleNestedAttribute{
 						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"interval_schedule": schema.SingleNestedAttribute{
@@ -240,10 +240,6 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 						Validators: []validator.Object{
 							validators.ExactlyOneChild(),
 						},
-						Validators: []validator.String{
-							validators.IsValidJSON(),
-						},
-						Description: `Parsed as JSON.`,
 					},
 					"type": schema.StringAttribute{
 						Required: true,

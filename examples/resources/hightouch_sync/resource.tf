@@ -14,17 +14,17 @@ resource "hightouch_sync" "my_sync" {
         "...",
     ]
             schedule = {
-        schedule = {
-            interval = {
-                quantity = 69.25
-                unit = "day"
+        schedule =     {
+                interval = {
+                    quantity = 21.68
+                    unit = "day"
+                }
             }
-        }
         type = "...my_type..."
     }
             slug = "...my_slug..."
             status = "warning"
             type = "...my_type..."
-            updated_at = "2022-03-16T09:33:50.291Z"
+            updated_at = "2021-04-09T11:24:10.949Z"
             workspace_id = "...my_workspaceId..."
         }

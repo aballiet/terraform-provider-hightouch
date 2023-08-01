@@ -3,8 +3,127 @@
 package shared
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"time"
 )
+
+type SyncScheduleScheduleType string
+
+const (
+	SyncScheduleScheduleTypeIntervalSchedule   SyncScheduleScheduleType = "IntervalSchedule"
+	SyncScheduleScheduleTypeCronSchedule       SyncScheduleScheduleType = "CronSchedule"
+	SyncScheduleScheduleTypeVisualCronSchedule SyncScheduleScheduleType = "VisualCronSchedule"
+	SyncScheduleScheduleTypeDBTSchedule        SyncScheduleScheduleType = "DBTSchedule"
+)
+
+type SyncScheduleSchedule struct {
+	IntervalSchedule   *IntervalSchedule
+	CronSchedule       *CronSchedule
+	VisualCronSchedule *VisualCronSchedule
+	DBTSchedule        *DBTSchedule
+
+	Type SyncScheduleScheduleType
+}
+
+func CreateSyncScheduleScheduleIntervalSchedule(intervalSchedule IntervalSchedule) SyncScheduleSchedule {
+	typ := SyncScheduleScheduleTypeIntervalSchedule
+
+	return SyncScheduleSchedule{
+		IntervalSchedule: &intervalSchedule,
+		Type:             typ,
+	}
+}
+
+func CreateSyncScheduleScheduleCronSchedule(cronSchedule CronSchedule) SyncScheduleSchedule {
+	typ := SyncScheduleScheduleTypeCronSchedule
+
+	return SyncScheduleSchedule{
+		CronSchedule: &cronSchedule,
+		Type:         typ,
+	}
+}
+
+func CreateSyncScheduleScheduleVisualCronSchedule(visualCronSchedule VisualCronSchedule) SyncScheduleSchedule {
+	typ := SyncScheduleScheduleTypeVisualCronSchedule
+
+	return SyncScheduleSchedule{
+		VisualCronSchedule: &visualCronSchedule,
+		Type:               typ,
+	}
+}
+
+func CreateSyncScheduleScheduleDBTSchedule(dbtSchedule DBTSchedule) SyncScheduleSchedule {
+	typ := SyncScheduleScheduleTypeDBTSchedule
+
+	return SyncScheduleSchedule{
+		DBTSchedule: &dbtSchedule,
+		Type:        typ,
+	}
+}
+
+func (u *SyncScheduleSchedule) UnmarshalJSON(data []byte) error {
+	var d *json.Decoder
+
+	intervalSchedule := new(IntervalSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&intervalSchedule); err == nil {
+		u.IntervalSchedule = intervalSchedule
+		u.Type = SyncScheduleScheduleTypeIntervalSchedule
+		return nil
+	}
+
+	cronSchedule := new(CronSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&cronSchedule); err == nil {
+		u.CronSchedule = cronSchedule
+		u.Type = SyncScheduleScheduleTypeCronSchedule
+		return nil
+	}
+
+	visualCronSchedule := new(VisualCronSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&visualCronSchedule); err == nil {
+		u.VisualCronSchedule = visualCronSchedule
+		u.Type = SyncScheduleScheduleTypeVisualCronSchedule
+		return nil
+	}
+
+	dbtSchedule := new(DBTSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&dbtSchedule); err == nil {
+		u.DBTSchedule = dbtSchedule
+		u.Type = SyncScheduleScheduleTypeDBTSchedule
+		return nil
+	}
+
+	return errors.New("could not unmarshal into supported union types")
+}
+
+func (u SyncScheduleSchedule) MarshalJSON() ([]byte, error) {
+	if u.IntervalSchedule != nil {
+		return json.Marshal(u.IntervalSchedule)
+	}
+
+	if u.CronSchedule != nil {
+		return json.Marshal(u.CronSchedule)
+	}
+
+	if u.VisualCronSchedule != nil {
+		return json.Marshal(u.VisualCronSchedule)
+	}
+
+	if u.DBTSchedule != nil {
+		return json.Marshal(u.DBTSchedule)
+	}
+
+	return nil, nil
+}
 
 // SyncSchedule - The scheduling configuration. It can be triggerd based on several ways:
 //
@@ -16,8 +135,8 @@ import (
 //
 // DBT-cloud: the sync will be trigged based on a dbt cloud job
 type SyncSchedule struct {
-	Schedule interface{} `json:"schedule"`
-	Type     string      `json:"type"`
+	Schedule SyncScheduleSchedule `json:"schedule"`
+	Type     string               `json:"type"`
 }
 
 // Sync - Syncs define how data from models are mapped to destinations. Each time a
