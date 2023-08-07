@@ -4,8 +4,27 @@ package provider
 
 import (
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"hightouch/internal/sdk/pkg/models/shared"
+	"time"
 )
+
+func (r *SourceResourceModel) RefreshFromGetResponse(resp *shared.Source) {
+	if r.Configuration == nil && len(resp.Configuration) > 0 {
+		r.Configuration = make(map[string]types.String)
+		for key, value := range resp.Configuration {
+			result, _ := json.Marshal(value)
+			r.Configuration[key] = types.StringValue(string(result))
+		}
+	}
+	r.CreatedAt = types.StringValue(resp.CreatedAt.Format(time.RFC3339))
+	r.ID = types.StringValue(resp.ID)
+	r.Name = types.StringValue(resp.Name)
+	r.Slug = types.StringValue(resp.Slug)
+	r.Type = types.StringValue(resp.Type)
+	r.UpdatedAt = types.StringValue(resp.UpdatedAt.Format(time.RFC3339))
+	r.WorkspaceID = types.StringValue(resp.WorkspaceID)
+}
 
 func (r *SourceResourceModel) RefreshFromCreateResponse(resp *shared.ValidateErrorJSON) {
 	if r.Details == nil && len(resp.Details) > 0 {

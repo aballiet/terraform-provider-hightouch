@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -77,7 +78,7 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 					`configuration. It may change as Hightouch updates its internal code.`,
 			},
 			"created_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
@@ -99,11 +100,11 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 				Description: `Whether the sync has been disabled by the user.`,
 			},
 			"id": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The sync's id`,
 			},
 			"last_run_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
@@ -123,11 +124,11 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 				Description: `The id of the Model that sync is connected to`,
 			},
 			"primary_key": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The primary key that sync uses to identify data from source`,
 			},
 			"referenced_columns": schema.ListAttribute{
-				Required:    true,
+				Computed:    true,
 				ElementType: types.StringType,
 				Description: `The reference column that sync depends on to sync data from source`,
 			},
@@ -135,19 +136,19 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"schedule": schema.SingleNestedAttribute{
-						Required: true,
+						Computed: true,
 						Attributes: map[string]schema.Attribute{
 							"interval_schedule": schema.SingleNestedAttribute{
-								Optional: true,
+								Computed: true,
 								Attributes: map[string]schema.Attribute{
 									"interval": schema.SingleNestedAttribute{
-										Required: true,
+										Computed: true,
 										Attributes: map[string]schema.Attribute{
 											"quantity": schema.NumberAttribute{
-												Required: true,
+												Computed: true,
 											},
 											"unit": schema.StringAttribute{
-												Required: true,
+												Computed: true,
 												Validators: []validator.String{
 													stringvalidator.OneOf(
 														"minute",
@@ -163,49 +164,49 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 								},
 							},
 							"cron_schedule": schema.SingleNestedAttribute{
-								Optional: true,
+								Computed: true,
 								Attributes: map[string]schema.Attribute{
 									"expression": schema.StringAttribute{
-										Required: true,
+										Computed: true,
 									},
 								},
 							},
 							"visual_cron_schedule": schema.SingleNestedAttribute{
-								Optional: true,
+								Computed: true,
 								Attributes: map[string]schema.Attribute{
 									"expressions": schema.ListNestedAttribute{
-										Required: true,
+										Computed: true,
 										NestedObject: schema.NestedAttributeObject{
 											Attributes: map[string]schema.Attribute{
 												"days": schema.SingleNestedAttribute{
-													Required: true,
+													Computed: true,
 													Attributes: map[string]schema.Attribute{
 														"friday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 														"monday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 														"saturday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 														"sunday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 														"thursday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 														"tuesday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 														"wednesday": schema.BoolAttribute{
-															Optional: true,
+															Computed: true,
 														},
 													},
 													Description: `Construct a type with a set of properties K of type T`,
 												},
 												"time": schema.StringAttribute{
-													Required: true,
+													Computed: true,
 												},
 											},
 										},
@@ -213,24 +214,24 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 								},
 							},
 							"dbt_schedule": schema.SingleNestedAttribute{
-								Optional: true,
+								Computed: true,
 								Attributes: map[string]schema.Attribute{
 									"account": schema.SingleNestedAttribute{
-										Required: true,
+										Computed: true,
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{
-												Required: true,
+												Computed: true,
 											},
 										},
 									},
 									"dbt_credential_id": schema.StringAttribute{
-										Required: true,
+										Computed: true,
 									},
 									"job": schema.SingleNestedAttribute{
-										Required: true,
+										Computed: true,
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{
-												Required: true,
+												Computed: true,
 											},
 										},
 									},
@@ -242,7 +243,7 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 						},
 					},
 					"type": schema.StringAttribute{
-						Required: true,
+						Computed: true,
 					},
 				},
 				MarkdownDescription: `The scheduling configuration. It can be triggerd based on several ways:` + "\n" +
@@ -260,7 +261,7 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 				Description: `The sync's slug`,
 			},
 			"status": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"disabled",
@@ -283,14 +284,14 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 				Required: true,
 			},
 			"updated_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
 				Description: `The timestamp when the sync was last updated`,
 			},
 			"workspace_id": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The id of the workspace that the sync belongs to`,
 			},
 		},
@@ -340,7 +341,7 @@ func (r *SyncResource) Create(ctx context.Context, req resource.CreateRequest, r
 	destinationID := data.DestinationID.ValueString()
 	disabled := data.Disabled.ValueBool()
 	modelID := data.ModelID.ValueString()
-	var schedule1 interface{}
+	var schedule1 shared.SyncCreateScheduleSchedule
 	var intervalSchedule *shared.IntervalSchedule
 	if data.Schedule != nil {
 		quantity, _ := data.Schedule.Quantity.ValueBigFloat().Float64()
@@ -354,7 +355,9 @@ func (r *SyncResource) Create(ctx context.Context, req resource.CreateRequest, r
 		}
 	}
 	if intervalSchedule != nil {
-		schedule1 = intervalSchedule
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			IntervalSchedule: intervalSchedule,
+		}
 	}
 	var cronSchedule *shared.CronSchedule
 	if data.Schedule != nil {
@@ -364,11 +367,13 @@ func (r *SyncResource) Create(ctx context.Context, req resource.CreateRequest, r
 		}
 	}
 	if cronSchedule != nil {
-		schedule1 = cronSchedule
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			CronSchedule: cronSchedule,
+		}
 	}
 	var visualCronSchedule *shared.VisualCronSchedule
 	if data.Schedule != nil {
-		expressions := make([]shared.VisualCronScheduleExpressions, 0)
+		var expressions []shared.VisualCronScheduleExpressions = nil
 		for _, expressionsItem := range data.Schedule.Expressions {
 			friday := new(bool)
 			if !expressionsItem.Friday.IsUnknown() && !expressionsItem.Friday.IsNull() {
@@ -432,7 +437,9 @@ func (r *SyncResource) Create(ctx context.Context, req resource.CreateRequest, r
 		}
 	}
 	if visualCronSchedule != nil {
-		schedule1 = visualCronSchedule
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			VisualCronSchedule: visualCronSchedule,
+		}
 	}
 	var dbtSchedule *shared.DBTSchedule
 	if data.Schedule != nil {
@@ -452,7 +459,9 @@ func (r *SyncResource) Create(ctx context.Context, req resource.CreateRequest, r
 		}
 	}
 	if dbtSchedule != nil {
-		schedule1 = dbtSchedule
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			DBTSchedule: dbtSchedule,
+		}
 	}
 	type1 := data.Type.ValueString()
 	schedule := shared.SyncCreateSchedule{
@@ -509,7 +518,28 @@ func (r *SyncResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 		return
 	}
 
-	// Not Implemented; we rely entirely on CREATE API request response
+	id := data.ID.ValueString()
+	request := operations.GetSyncRequest{
+		ID: id,
+	}
+	res, err := r.client.GetSync(ctx, request)
+	if err != nil {
+		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		return
+	}
+	if res == nil {
+		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
+		return
+	}
+	if res.StatusCode != 200 {
+		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
+		return
+	}
+	if res.Sync == nil {
+		resp.Diagnostics.AddError("unexpected response from API. No response body", debugResponse(res.RawResponse))
+		return
+	}
+	data.RefreshFromGetResponse(res.Sync)
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -531,7 +561,7 @@ func (r *SyncResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		disabled = nil
 	}
 	var schedule *shared.SyncUpdateSchedule
-	var schedule1 interface{}
+	var schedule1 shared.SyncUpdateScheduleSchedule
 	var intervalSchedule *shared.IntervalSchedule
 	if data.Schedule != nil {
 		quantity, _ := data.Schedule.Quantity.ValueBigFloat().Float64()
@@ -545,7 +575,9 @@ func (r *SyncResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		}
 	}
 	if intervalSchedule != nil {
-		schedule1 = intervalSchedule
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			IntervalSchedule: intervalSchedule,
+		}
 	}
 	var cronSchedule *shared.CronSchedule
 	if data.Schedule != nil {
@@ -555,11 +587,13 @@ func (r *SyncResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		}
 	}
 	if cronSchedule != nil {
-		schedule1 = cronSchedule
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			CronSchedule: cronSchedule,
+		}
 	}
 	var visualCronSchedule *shared.VisualCronSchedule
 	if data.Schedule != nil {
-		expressions := make([]shared.VisualCronScheduleExpressions, 0)
+		var expressions []shared.VisualCronScheduleExpressions = nil
 		for _, expressionsItem := range data.Schedule.Expressions {
 			friday := new(bool)
 			if !expressionsItem.Friday.IsUnknown() && !expressionsItem.Friday.IsNull() {
@@ -623,7 +657,9 @@ func (r *SyncResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		}
 	}
 	if visualCronSchedule != nil {
-		schedule1 = visualCronSchedule
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			VisualCronSchedule: visualCronSchedule,
+		}
 	}
 	var dbtSchedule *shared.DBTSchedule
 	if data.Schedule != nil {
@@ -643,7 +679,9 @@ func (r *SyncResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		}
 	}
 	if dbtSchedule != nil {
-		schedule1 = dbtSchedule
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			DBTSchedule: dbtSchedule,
+		}
 	}
 	type1 := data.Type.ValueString()
 	schedule = &shared.SyncUpdateSchedule{
@@ -705,5 +743,5 @@ func (r *SyncResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 }
 
 func (r *SyncResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.AddError("Not Implemented", "No available import state operation is available for resource sync.")
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

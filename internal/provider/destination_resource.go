@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -71,7 +72,7 @@ func (r *DestinationResource) Schema(ctx context.Context, req resource.SchemaReq
 					`configuration. It may change as Hightouch updates its internal code.`,
 			},
 			"created_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
@@ -85,7 +86,7 @@ func (r *DestinationResource) Schema(ctx context.Context, req resource.SchemaReq
 				},
 			},
 			"id": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The destination's id`,
 			},
 			"message": schema.StringAttribute{
@@ -106,7 +107,7 @@ func (r *DestinationResource) Schema(ctx context.Context, req resource.SchemaReq
 				Description: `The destination's slug`,
 			},
 			"syncs": schema.ListAttribute{
-				Required:    true,
+				Computed:    true,
 				ElementType: types.StringType,
 				Description: `A list of syncs that sync to this destination.`,
 			},
@@ -115,14 +116,14 @@ func (r *DestinationResource) Schema(ctx context.Context, req resource.SchemaReq
 				Description: `The destination's type (e.g. salesforce or hubspot).`,
 			},
 			"updated_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
 				Description: `The timestamp when the destination was last updated`,
 			},
 			"workspace_id": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The id of the workspace that the destination belongs to`,
 			},
 		},
@@ -219,7 +220,28 @@ func (r *DestinationResource) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
-	// Not Implemented; we rely entirely on CREATE API request response
+	id := data.ID.ValueString()
+	request := operations.GetDestinationRequest{
+		ID: id,
+	}
+	res, err := r.client.GetDestination(ctx, request)
+	if err != nil {
+		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		return
+	}
+	if res == nil {
+		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
+		return
+	}
+	if res.StatusCode != 200 {
+		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
+		return
+	}
+	if res.Destination == nil {
+		resp.Diagnostics.AddError("unexpected response from API. No response body", debugResponse(res.RawResponse))
+		return
+	}
+	data.RefreshFromGetResponse(res.Destination)
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -294,5 +316,5 @@ func (r *DestinationResource) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r *DestinationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.AddError("Not Implemented", "No available import state operation is available for resource destination.")
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

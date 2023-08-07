@@ -2,7 +2,7 @@
 
 package provider
 
-type Schedule struct {
+type SyncCreateScheduleSchedule struct {
 	IntervalSchedule   *IntervalSchedule   `tfsdk:"interval_schedule"`
 	CronSchedule       *CronSchedule       `tfsdk:"cron_schedule"`
 	VisualCronSchedule *VisualCronSchedule `tfsdk:"visual_cron_schedule"`

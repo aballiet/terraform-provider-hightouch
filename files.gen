@@ -12,7 +12,7 @@ internal/provider/type_visual_cron_schedule_expressions.go
 internal/provider/type_visual_cron_schedule.go
 internal/provider/type_dbt_schedule_account.go
 internal/provider/type_dbt_schedule.go
-internal/provider/type_schedule.go
+internal/provider/type_sync_create_schedule_schedule.go
 internal/provider/type_sync_create_schedule.go
 examples/README.md
 go.mod
@@ -126,3 +126,15 @@ examples/resources/hightouch_source/resource.tf
 internal/provider/sync_resource.go
 internal/provider/sync_resource_sdk.go
 examples/resources/hightouch_sync/resource.tf
+internal/provider/destination_data_source.go
+internal/provider/destination_data_source_sdk.go
+examples/data-sources/hightouch_destination/data-source.tf
+internal/provider/model_data_source.go
+internal/provider/model_data_source_sdk.go
+examples/data-sources/hightouch_model/data-source.tf
+internal/provider/source_data_source.go
+internal/provider/source_data_source_sdk.go
+examples/data-sources/hightouch_source/data-source.tf
+internal/provider/sync_data_source.go
+internal/provider/sync_data_source_sdk.go
+examples/data-sources/hightouch_sync/data-source.tf

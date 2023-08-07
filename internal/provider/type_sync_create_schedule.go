@@ -5,6 +5,6 @@ package provider
 import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type SyncCreateSchedule struct {
-	Schedule Schedule     `tfsdk:"schedule"`
-	Type     types.String `tfsdk:"type"`
+	Schedule SyncCreateScheduleSchedule `tfsdk:"schedule"`
+	Type     types.String               `tfsdk:"type"`
 }

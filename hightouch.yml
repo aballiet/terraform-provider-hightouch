@@ -1081,6 +1081,7 @@ paths:
   "/destinations/{id}":
     get:
       operationId: GetDestination
+      x-speakeasy-entity-operation: Destination#read
       responses:
         '200':
           description: Ok
@@ -1383,6 +1384,7 @@ paths:
   "/sources/{id}":
     get:
       operationId: GetSource
+      x-speakeasy-entity-operation: Source#read
       responses:
         '200':
           description: Ok
@@ -1652,6 +1654,7 @@ paths:
   "/models/{modelId}":
     get:
       operationId: GetModel
+      x-speakeasy-entity-operation: Model#read
       responses:
         '200':
           description: Ok
@@ -1950,6 +1953,7 @@ paths:
   "/syncs/{id}":
     get:
       operationId: GetSync
+      x-speakeasy-entity-operation: Sync#read
       responses:
         '200':
           description: Ok

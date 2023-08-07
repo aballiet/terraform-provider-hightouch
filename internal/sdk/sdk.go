@@ -120,7 +120,7 @@ func New(opts ...SDKOption) *Hightouch {
 			Language:          "terraform",
 			OpenAPIDocVersion: "1.0.0",
 			SDKVersion:        "0.0.1",
-			GenVersion:        "2.75.1",
+			GenVersion:        "2.81.1",
 		},
 	}
 	for _, opt := range opts {
@@ -193,7 +193,7 @@ func (s *Hightouch) CreateDestination(ctx context.Context, request shared.Destin
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.CreateDestination200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -279,7 +279,7 @@ func (s *Hightouch) CreateModel(ctx context.Context, request shared.ModelCreate)
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.CreateModel200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -365,7 +365,7 @@ func (s *Hightouch) CreateSource(ctx context.Context, request shared.SourceCreat
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.CreateSource200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -451,7 +451,7 @@ func (s *Hightouch) CreateSync(ctx context.Context, request shared.SyncCreate) (
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.CreateSync200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -1208,7 +1208,7 @@ func (s *Hightouch) TriggerRunCustom(ctx context.Context, request shared.Trigger
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.TriggerRunCustom200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -1363,7 +1363,7 @@ func (s *Hightouch) UpdateDestination(ctx context.Context, request operations.Up
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.UpdateDestination200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -1454,7 +1454,7 @@ func (s *Hightouch) UpdateModel(ctx context.Context, request operations.UpdateMo
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.UpdateModel200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -1545,7 +1545,7 @@ func (s *Hightouch) UpdateSource(ctx context.Context, request operations.UpdateS
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.UpdateSource200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
@@ -1636,7 +1636,7 @@ func (s *Hightouch) UpdateSync(ctx context.Context, request operations.UpdateSyn
 	case httpRes.StatusCode == 200:
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
-			var out interface{}
+			var out *operations.UpdateSync200ApplicationJSON
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}

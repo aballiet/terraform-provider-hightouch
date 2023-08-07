@@ -2,6 +2,128 @@
 
 package shared
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+)
+
+type SyncUpdateScheduleScheduleType string
+
+const (
+	SyncUpdateScheduleScheduleTypeIntervalSchedule   SyncUpdateScheduleScheduleType = "IntervalSchedule"
+	SyncUpdateScheduleScheduleTypeCronSchedule       SyncUpdateScheduleScheduleType = "CronSchedule"
+	SyncUpdateScheduleScheduleTypeVisualCronSchedule SyncUpdateScheduleScheduleType = "VisualCronSchedule"
+	SyncUpdateScheduleScheduleTypeDBTSchedule        SyncUpdateScheduleScheduleType = "DBTSchedule"
+)
+
+type SyncUpdateScheduleSchedule struct {
+	IntervalSchedule   *IntervalSchedule
+	CronSchedule       *CronSchedule
+	VisualCronSchedule *VisualCronSchedule
+	DBTSchedule        *DBTSchedule
+
+	Type SyncUpdateScheduleScheduleType
+}
+
+func CreateSyncUpdateScheduleScheduleIntervalSchedule(intervalSchedule IntervalSchedule) SyncUpdateScheduleSchedule {
+	typ := SyncUpdateScheduleScheduleTypeIntervalSchedule
+
+	return SyncUpdateScheduleSchedule{
+		IntervalSchedule: &intervalSchedule,
+		Type:             typ,
+	}
+}
+
+func CreateSyncUpdateScheduleScheduleCronSchedule(cronSchedule CronSchedule) SyncUpdateScheduleSchedule {
+	typ := SyncUpdateScheduleScheduleTypeCronSchedule
+
+	return SyncUpdateScheduleSchedule{
+		CronSchedule: &cronSchedule,
+		Type:         typ,
+	}
+}
+
+func CreateSyncUpdateScheduleScheduleVisualCronSchedule(visualCronSchedule VisualCronSchedule) SyncUpdateScheduleSchedule {
+	typ := SyncUpdateScheduleScheduleTypeVisualCronSchedule
+
+	return SyncUpdateScheduleSchedule{
+		VisualCronSchedule: &visualCronSchedule,
+		Type:               typ,
+	}
+}
+
+func CreateSyncUpdateScheduleScheduleDBTSchedule(dbtSchedule DBTSchedule) SyncUpdateScheduleSchedule {
+	typ := SyncUpdateScheduleScheduleTypeDBTSchedule
+
+	return SyncUpdateScheduleSchedule{
+		DBTSchedule: &dbtSchedule,
+		Type:        typ,
+	}
+}
+
+func (u *SyncUpdateScheduleSchedule) UnmarshalJSON(data []byte) error {
+	var d *json.Decoder
+
+	intervalSchedule := new(IntervalSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&intervalSchedule); err == nil {
+		u.IntervalSchedule = intervalSchedule
+		u.Type = SyncUpdateScheduleScheduleTypeIntervalSchedule
+		return nil
+	}
+
+	cronSchedule := new(CronSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&cronSchedule); err == nil {
+		u.CronSchedule = cronSchedule
+		u.Type = SyncUpdateScheduleScheduleTypeCronSchedule
+		return nil
+	}
+
+	visualCronSchedule := new(VisualCronSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&visualCronSchedule); err == nil {
+		u.VisualCronSchedule = visualCronSchedule
+		u.Type = SyncUpdateScheduleScheduleTypeVisualCronSchedule
+		return nil
+	}
+
+	dbtSchedule := new(DBTSchedule)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&dbtSchedule); err == nil {
+		u.DBTSchedule = dbtSchedule
+		u.Type = SyncUpdateScheduleScheduleTypeDBTSchedule
+		return nil
+	}
+
+	return errors.New("could not unmarshal into supported union types")
+}
+
+func (u SyncUpdateScheduleSchedule) MarshalJSON() ([]byte, error) {
+	if u.IntervalSchedule != nil {
+		return json.Marshal(u.IntervalSchedule)
+	}
+
+	if u.CronSchedule != nil {
+		return json.Marshal(u.CronSchedule)
+	}
+
+	if u.VisualCronSchedule != nil {
+		return json.Marshal(u.VisualCronSchedule)
+	}
+
+	if u.DBTSchedule != nil {
+		return json.Marshal(u.DBTSchedule)
+	}
+
+	return nil, nil
+}
+
 // SyncUpdateSchedule - The scheduling configuration. It can be triggerd based on several ways:
 //
 // Interval: the sync will be trigged based on certain interval(minutes/hours/days/weeks)
@@ -12,8 +134,8 @@ package shared
 //
 // DBT-cloud: the sync will be trigged based on a dbt cloud job
 type SyncUpdateSchedule struct {
-	Schedule interface{} `json:"schedule"`
-	Type     string      `json:"type"`
+	Schedule SyncUpdateScheduleSchedule `json:"schedule"`
+	Type     string                     `json:"type"`
 }
 
 // SyncUpdate - The input for updating a Sync

@@ -3,14 +3,109 @@
 package operations
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"hightouch/internal/sdk/pkg/models/shared"
 	"net/http"
 )
 
+type CreateSync200ApplicationJSONType string
+
+const (
+	CreateSync200ApplicationJSONTypeSync                CreateSync200ApplicationJSONType = "Sync"
+	CreateSync200ApplicationJSONTypeValidateErrorJSON   CreateSync200ApplicationJSONType = "ValidateErrorJSON"
+	CreateSync200ApplicationJSONTypeInternalServerError CreateSync200ApplicationJSONType = "InternalServerError"
+)
+
+type CreateSync200ApplicationJSON struct {
+	Sync                *shared.Sync
+	ValidateErrorJSON   *shared.ValidateErrorJSON
+	InternalServerError *shared.InternalServerError
+
+	Type CreateSync200ApplicationJSONType
+}
+
+func CreateCreateSync200ApplicationJSONSync(sync shared.Sync) CreateSync200ApplicationJSON {
+	typ := CreateSync200ApplicationJSONTypeSync
+
+	return CreateSync200ApplicationJSON{
+		Sync: &sync,
+		Type: typ,
+	}
+}
+
+func CreateCreateSync200ApplicationJSONValidateErrorJSON(validateErrorJSON shared.ValidateErrorJSON) CreateSync200ApplicationJSON {
+	typ := CreateSync200ApplicationJSONTypeValidateErrorJSON
+
+	return CreateSync200ApplicationJSON{
+		ValidateErrorJSON: &validateErrorJSON,
+		Type:              typ,
+	}
+}
+
+func CreateCreateSync200ApplicationJSONInternalServerError(internalServerError shared.InternalServerError) CreateSync200ApplicationJSON {
+	typ := CreateSync200ApplicationJSONTypeInternalServerError
+
+	return CreateSync200ApplicationJSON{
+		InternalServerError: &internalServerError,
+		Type:                typ,
+	}
+}
+
+func (u *CreateSync200ApplicationJSON) UnmarshalJSON(data []byte) error {
+	var d *json.Decoder
+
+	sync := new(shared.Sync)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&sync); err == nil {
+		u.Sync = sync
+		u.Type = CreateSync200ApplicationJSONTypeSync
+		return nil
+	}
+
+	validateErrorJSON := new(shared.ValidateErrorJSON)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&validateErrorJSON); err == nil {
+		u.ValidateErrorJSON = validateErrorJSON
+		u.Type = CreateSync200ApplicationJSONTypeValidateErrorJSON
+		return nil
+	}
+
+	internalServerError := new(shared.InternalServerError)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&internalServerError); err == nil {
+		u.InternalServerError = internalServerError
+		u.Type = CreateSync200ApplicationJSONTypeInternalServerError
+		return nil
+	}
+
+	return errors.New("could not unmarshal into supported union types")
+}
+
+func (u CreateSync200ApplicationJSON) MarshalJSON() ([]byte, error) {
+	if u.Sync != nil {
+		return json.Marshal(u.Sync)
+	}
+
+	if u.ValidateErrorJSON != nil {
+		return json.Marshal(u.ValidateErrorJSON)
+	}
+
+	if u.InternalServerError != nil {
+		return json.Marshal(u.InternalServerError)
+	}
+
+	return nil, nil
+}
+
 type CreateSyncResponse struct {
 	ContentType string
 	// Ok
-	CreateSync200ApplicationJSONAnyOf interface{}
+	CreateSync200ApplicationJSONAnyOf *CreateSync200ApplicationJSON
 	// Something went wrong
 	InternalServerError *shared.InternalServerError
 	StatusCode          int

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (r *DestinationResourceModel) RefreshFromGetResponse(resp *shared.Destination) {
+func (r *DestinationDataSourceModel) RefreshFromGetResponse(resp *shared.Destination) {
 	if r.Configuration == nil && len(resp.Configuration) > 0 {
 		r.Configuration = make(map[string]types.String)
 		for key, value := range resp.Configuration {
@@ -28,19 +28,4 @@ func (r *DestinationResourceModel) RefreshFromGetResponse(resp *shared.Destinati
 	r.Type = types.StringValue(resp.Type)
 	r.UpdatedAt = types.StringValue(resp.UpdatedAt.Format(time.RFC3339))
 	r.WorkspaceID = types.StringValue(resp.WorkspaceID)
-}
-
-func (r *DestinationResourceModel) RefreshFromCreateResponse(resp *shared.ValidateErrorJSON) {
-	if r.Details == nil && len(resp.Details) > 0 {
-		r.Details = make(map[string]types.String)
-		for key, value := range resp.Details {
-			result, _ := json.Marshal(value)
-			r.Details[key] = types.StringValue(string(result))
-		}
-	}
-	r.Message = types.StringValue(string(resp.Message))
-}
-
-func (r *DestinationResourceModel) RefreshFromUpdateResponse(resp *shared.ValidateErrorJSON) {
-	r.RefreshFromCreateResponse(resp)
 }

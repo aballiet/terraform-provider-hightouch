@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (r *ModelResourceModel) RefreshFromGetResponse(resp *shared.Model) {
+func (r *ModelDataSourceModel) RefreshFromGetResponse(resp *shared.Model) {
 	r.CreatedAt = types.StringValue(resp.CreatedAt.Format(time.RFC3339))
 	if r.Custom == nil {
 		r.Custom = &ModelCreateCustom{}
@@ -86,19 +86,4 @@ func (r *ModelResourceModel) RefreshFromGetResponse(resp *shared.Model) {
 		r.Visual.SecondaryLabel = types.StringValue(resp.Visual.SecondaryLabel)
 	}
 	r.WorkspaceID = types.StringValue(resp.WorkspaceID)
-}
-
-func (r *ModelResourceModel) RefreshFromCreateResponse(resp *shared.ValidateErrorJSON) {
-	if r.Details == nil && len(resp.Details) > 0 {
-		r.Details = make(map[string]types.String)
-		for key, value := range resp.Details {
-			result, _ := json.Marshal(value)
-			r.Details[key] = types.StringValue(string(result))
-		}
-	}
-	r.Message = types.StringValue(string(resp.Message))
-}
-
-func (r *ModelResourceModel) RefreshFromUpdateResponse(resp *shared.ValidateErrorJSON) {
-	r.RefreshFromCreateResponse(resp)
 }

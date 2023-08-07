@@ -91,7 +91,12 @@ func (p *HightouchProvider) Resources(ctx context.Context) []func() resource.Res
 }
 
 func (p *HightouchProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		NewDestinationDataSource,
+		NewModelDataSource,
+		NewSourceDataSource,
+		NewSyncDataSource,
+	}
 }
 
 func New(version string) func() provider.Provider {

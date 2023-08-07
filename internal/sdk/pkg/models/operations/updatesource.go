@@ -3,6 +3,9 @@
 package operations
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"hightouch/internal/sdk/pkg/models/shared"
 	"net/http"
 )
@@ -13,6 +16,98 @@ type UpdateSourceRequest struct {
 	ID string `pathParam:"style=simple,explode=false,name=id"`
 }
 
+type UpdateSource200ApplicationJSONType string
+
+const (
+	UpdateSource200ApplicationJSONTypeSource              UpdateSource200ApplicationJSONType = "Source"
+	UpdateSource200ApplicationJSONTypeValidateErrorJSON   UpdateSource200ApplicationJSONType = "ValidateErrorJSON"
+	UpdateSource200ApplicationJSONTypeInternalServerError UpdateSource200ApplicationJSONType = "InternalServerError"
+)
+
+type UpdateSource200ApplicationJSON struct {
+	Source              *shared.Source
+	ValidateErrorJSON   *shared.ValidateErrorJSON
+	InternalServerError *shared.InternalServerError
+
+	Type UpdateSource200ApplicationJSONType
+}
+
+func CreateUpdateSource200ApplicationJSONSource(source shared.Source) UpdateSource200ApplicationJSON {
+	typ := UpdateSource200ApplicationJSONTypeSource
+
+	return UpdateSource200ApplicationJSON{
+		Source: &source,
+		Type:   typ,
+	}
+}
+
+func CreateUpdateSource200ApplicationJSONValidateErrorJSON(validateErrorJSON shared.ValidateErrorJSON) UpdateSource200ApplicationJSON {
+	typ := UpdateSource200ApplicationJSONTypeValidateErrorJSON
+
+	return UpdateSource200ApplicationJSON{
+		ValidateErrorJSON: &validateErrorJSON,
+		Type:              typ,
+	}
+}
+
+func CreateUpdateSource200ApplicationJSONInternalServerError(internalServerError shared.InternalServerError) UpdateSource200ApplicationJSON {
+	typ := UpdateSource200ApplicationJSONTypeInternalServerError
+
+	return UpdateSource200ApplicationJSON{
+		InternalServerError: &internalServerError,
+		Type:                typ,
+	}
+}
+
+func (u *UpdateSource200ApplicationJSON) UnmarshalJSON(data []byte) error {
+	var d *json.Decoder
+
+	source := new(shared.Source)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&source); err == nil {
+		u.Source = source
+		u.Type = UpdateSource200ApplicationJSONTypeSource
+		return nil
+	}
+
+	validateErrorJSON := new(shared.ValidateErrorJSON)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&validateErrorJSON); err == nil {
+		u.ValidateErrorJSON = validateErrorJSON
+		u.Type = UpdateSource200ApplicationJSONTypeValidateErrorJSON
+		return nil
+	}
+
+	internalServerError := new(shared.InternalServerError)
+	d = json.NewDecoder(bytes.NewReader(data))
+	d.DisallowUnknownFields()
+	if err := d.Decode(&internalServerError); err == nil {
+		u.InternalServerError = internalServerError
+		u.Type = UpdateSource200ApplicationJSONTypeInternalServerError
+		return nil
+	}
+
+	return errors.New("could not unmarshal into supported union types")
+}
+
+func (u UpdateSource200ApplicationJSON) MarshalJSON() ([]byte, error) {
+	if u.Source != nil {
+		return json.Marshal(u.Source)
+	}
+
+	if u.ValidateErrorJSON != nil {
+		return json.Marshal(u.ValidateErrorJSON)
+	}
+
+	if u.InternalServerError != nil {
+		return json.Marshal(u.InternalServerError)
+	}
+
+	return nil, nil
+}
+
 type UpdateSourceResponse struct {
 	ContentType string
 	// Something went wrong
@@ -20,7 +115,7 @@ type UpdateSourceResponse struct {
 	StatusCode          int
 	RawResponse         *http.Response
 	// Ok
-	UpdateSource200ApplicationJSONAnyOf interface{}
+	UpdateSource200ApplicationJSONAnyOf *UpdateSource200ApplicationJSON
 	// Validation Failed
 	ValidateErrorJSON *shared.ValidateErrorJSON
 }

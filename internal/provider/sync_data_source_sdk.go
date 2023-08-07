@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (r *SyncResourceModel) RefreshFromGetResponse(resp *shared.Sync) {
+func (r *SyncDataSourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 	if r.Configuration == nil && len(resp.Configuration) > 0 {
 		r.Configuration = make(map[string]types.String)
 		for key, value := range resp.Configuration {
@@ -93,19 +93,4 @@ func (r *SyncResourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 	r.Status = types.StringValue(string(resp.Status))
 	r.UpdatedAt = types.StringValue(resp.UpdatedAt.Format(time.RFC3339))
 	r.WorkspaceID = types.StringValue(resp.WorkspaceID)
-}
-
-func (r *SyncResourceModel) RefreshFromCreateResponse(resp *shared.ValidateErrorJSON) {
-	if r.Details == nil && len(resp.Details) > 0 {
-		r.Details = make(map[string]types.String)
-		for key, value := range resp.Details {
-			result, _ := json.Marshal(value)
-			r.Details[key] = types.StringValue(string(result))
-		}
-	}
-	r.Message = types.StringValue(string(resp.Message))
-}
-
-func (r *SyncResourceModel) RefreshFromUpdateResponse(resp *shared.ValidateErrorJSON) {
-	r.RefreshFromCreateResponse(resp)
 }

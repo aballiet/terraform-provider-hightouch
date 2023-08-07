@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -70,7 +71,7 @@ func (r *SourceResource) Schema(ctx context.Context, req resource.SchemaRequest,
 					`configuration. It may change as Hightouch updates its internal code.`,
 			},
 			"created_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
@@ -84,7 +85,7 @@ func (r *SourceResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				},
 			},
 			"id": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The source's id`,
 			},
 			"message": schema.StringAttribute{
@@ -109,14 +110,14 @@ func (r *SourceResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				Description: `The source's type (e.g. snowflake or postgres).`,
 			},
 			"updated_at": schema.StringAttribute{
-				Required: true,
+				Computed: true,
 				Validators: []validator.String{
 					validators.IsRFC3339(),
 				},
 				Description: `The timestamp when the source was last updated`,
 			},
 			"workspace_id": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
 				Description: `The id of the workspace that the source belongs to`,
 			},
 		},
@@ -213,7 +214,28 @@ func (r *SourceResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	// Not Implemented; we rely entirely on CREATE API request response
+	id := data.ID.ValueString()
+	request := operations.GetSourceRequest{
+		ID: id,
+	}
+	res, err := r.client.GetSource(ctx, request)
+	if err != nil {
+		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		return
+	}
+	if res == nil {
+		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
+		return
+	}
+	if res.StatusCode != 200 {
+		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
+		return
+	}
+	if res.Source == nil {
+		resp.Diagnostics.AddError("unexpected response from API. No response body", debugResponse(res.RawResponse))
+		return
+	}
+	data.RefreshFromGetResponse(res.Source)
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -288,5 +310,5 @@ func (r *SourceResource) Delete(ctx context.Context, req resource.DeleteRequest,
 }
 
 func (r *SourceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.AddError("Not Implemented", "No available import state operation is available for resource source.")
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
