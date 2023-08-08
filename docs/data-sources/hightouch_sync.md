@@ -14,7 +14,7 @@ Sync DataSource
 
 ```terraform
 data "hightouch_sync" "my_sync" {
-    id = "10faaa23-52c5-4955-907a-ff1a3a2fa946"
+    id = "3f5ad019-da1f-4fe7-8f09-7b0074f15471"
         }
 ```
 

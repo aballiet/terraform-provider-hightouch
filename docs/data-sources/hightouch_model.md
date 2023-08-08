@@ -14,7 +14,7 @@ Model DataSource
 
 ```terraform
 data "hightouch_model" "my_model" {
-    model_id = "...my_model_id..."
+    id = "92059293-96fe-4a75-96eb-10faaa2352c5"
         }
 ```
 
@@ -23,14 +23,13 @@ data "hightouch_model" "my_model" {
 
 ### Required
 
-- `model_id` (String) The id of the model
+- `id` (String) The id of the model
 
 ### Read-Only
 
 - `created_at` (String) The timestamp when model was created
 - `custom` (Attributes) Custom query for sources that doesn't support sql. For example, Airtable. (see [below for nested schema](#nestedatt--custom))
 - `dbt` (Attributes) Query that is based on a dbt model (see [below for nested schema](#nestedatt--dbt))
-- `id` (String) The id of the model
 - `is_schema` (Boolean) If is_schema is true, the model is just used to build other models.
 Either as part of visual querying, or as the root of a visual query.
 - `name` (String) The name of the model

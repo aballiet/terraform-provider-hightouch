@@ -417,6 +417,7 @@ components:
       additionalProperties: false
     ModelCreate:
       description: The input for creating a Model
+      x-speakeasy-entity: Model
       properties:
         name:
           type: string
@@ -503,6 +504,7 @@ components:
       additionalProperties: false
     ModelUpdate:
       description: The input for updating a Model
+      x-speakeasy-entity: Model
       properties:
         name:
           type: string
@@ -1083,7 +1085,7 @@ paths:
   "/destinations/{id}":
     get:
       operationId: GetDestination
-      x-speakeasy-entity-operation: Destination#read
+      x-speakeasy-entity-operation: Destination#get
       responses:
         '200':
           description: Ok
@@ -1386,7 +1388,7 @@ paths:
   "/sources/{id}":
     get:
       operationId: GetSource
-      x-speakeasy-entity-operation: Source#read
+      x-speakeasy-entity-operation: Source#get
       responses:
         '200':
           description: Ok
@@ -1653,10 +1655,10 @@ paths:
                 user: dbUserName
                 database: dbName
                 password: password!123
-  "/models/{modelId}":
+  "/models/{id}":
     get:
       operationId: GetModel
-      x-speakeasy-entity-operation: Model#read
+      x-speakeasy-entity-operation: Model#get
       responses:
         '200':
           description: Ok
@@ -1694,7 +1696,7 @@ paths:
       parameters:
       - description: The id of the model
         in: path
-        name: modelId
+        name: id
         required: true
         schema:
           type: string
@@ -1756,7 +1758,7 @@ paths:
       parameters:
       - description: The model's ID
         in: path
-        name: modelId
+        name: id
         required: true
         schema:
           type: string
@@ -1955,7 +1957,7 @@ paths:
   "/syncs/{id}":
     get:
       operationId: GetSync
-      x-speakeasy-entity-operation: Sync#read
+      x-speakeasy-entity-operation: Sync#get
       responses:
         '200':
           description: Ok

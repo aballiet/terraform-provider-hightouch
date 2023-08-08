@@ -15,10 +15,10 @@ Source Resource
 ```terraform
 resource "hightouch_source" "my_source" {
     configuration = {
-        "magnam" = "{ \"see\": \"documentation\" }"
-        "debitis" = "{ \"see\": \"documentation\" }"
+        "iusto" = "{ \"see\": \"documentation\" }"
+        "excepturi" = "{ \"see\": \"documentation\" }"
     }
-            name = "Lucia Goldner"
+            name = "Mrs. Sophie Smith MD"
             slug = "...my_slug..."
             type = "...my_type..."
         }

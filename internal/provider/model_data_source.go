@@ -36,7 +36,6 @@ type ModelDataSourceModel struct {
 	Dbt         *ModelCreateDbt         `tfsdk:"dbt"`
 	ID          types.String            `tfsdk:"id"`
 	IsSchema    types.Bool              `tfsdk:"is_schema"`
-	ModelID     types.String            `tfsdk:"model_id"`
 	Name        types.String            `tfsdk:"name"`
 	PrimaryKey  types.String            `tfsdk:"primary_key"`
 	QueryType   types.String            `tfsdk:"query_type"`
@@ -117,17 +116,13 @@ func (r *ModelDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Description: `Query that is based on a dbt model`,
 			},
 			"id": schema.StringAttribute{
-				Computed:    true,
+				Required:    true,
 				Description: `The id of the model`,
 			},
 			"is_schema": schema.BoolAttribute{
 				Computed: true,
 				MarkdownDescription: `If is_schema is true, the model is just used to build other models.` + "\n" +
 					`Either as part of visual querying, or as the root of a visual query.`,
-			},
-			"model_id": schema.StringAttribute{
-				Required:    true,
-				Description: `The id of the model`,
 			},
 			"name": schema.StringAttribute{
 				Computed:    true,
@@ -253,9 +248,9 @@ func (r *ModelDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	modelID := data.ModelID.ValueString()
+	id := data.ID.ValueString()
 	request := operations.GetModelRequest{
-		ModelID: modelID,
+		ID: id,
 	}
 	res, err := r.client.GetModel(ctx, request)
 	if err != nil {

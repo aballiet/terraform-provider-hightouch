@@ -13,7 +13,7 @@ import (
 type UpdateModelRequest struct {
 	ModelUpdate shared.ModelUpdate `request:"mediaType=application/json"`
 	// The model's ID
-	ModelID string `pathParam:"style=simple,explode=false,name=modelId"`
+	ID string `pathParam:"style=simple,explode=false,name=id"`
 }
 
 type UpdateModel200ApplicationJSONType string

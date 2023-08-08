@@ -549,7 +549,7 @@ func (s *Hightouch) GetDestination(ctx context.Context, request operations.GetDe
 // Retrieve models from model ID
 func (s *Hightouch) GetModel(ctx context.Context, request operations.GetModelRequest) (*operations.GetModelResponse, error) {
 	baseURL := utils.ReplaceParameters(s.sdkConfiguration.GetServerDetails())
-	url, err := utils.GenerateURL(ctx, baseURL, "/models/{modelId}", request, nil)
+	url, err := utils.GenerateURL(ctx, baseURL, "/models/{id}", request, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
@@ -1404,7 +1404,7 @@ func (s *Hightouch) UpdateDestination(ctx context.Context, request operations.Up
 // Patch a model based on its Hightouch ID
 func (s *Hightouch) UpdateModel(ctx context.Context, request operations.UpdateModelRequest) (*operations.UpdateModelResponse, error) {
 	baseURL := utils.ReplaceParameters(s.sdkConfiguration.GetServerDetails())
-	url, err := utils.GenerateURL(ctx, baseURL, "/models/{modelId}", request, nil)
+	url, err := utils.GenerateURL(ctx, baseURL, "/models/{id}", request, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}

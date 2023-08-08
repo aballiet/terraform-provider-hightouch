@@ -4,10 +4,8 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"hightouch/internal/sdk"
-	"hightouch/internal/sdk/pkg/models/shared"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -36,32 +34,25 @@ type ModelResource struct {
 
 // ModelResourceModel describes the resource data model.
 type ModelResourceModel struct {
-	CreatedAt      types.String            `tfsdk:"created_at"`
-	Custom         *ModelCreateCustom      `tfsdk:"custom"`
-	Dbt            *ModelCreateDbt         `tfsdk:"dbt"`
-	Details        map[string]types.String `tfsdk:"details"`
-	Filter         types.String            `tfsdk:"filter"`
-	ID             types.String            `tfsdk:"id"`
-	IsSchema       types.Bool              `tfsdk:"is_schema"`
-	Message        types.String            `tfsdk:"message"`
-	ModelID        types.String            `tfsdk:"model_id"`
-	Name           types.String            `tfsdk:"name"`
-	ParentID       types.String            `tfsdk:"parent_id"`
-	PrimaryKey     types.String            `tfsdk:"primary_key"`
-	PrimaryLabel   types.String            `tfsdk:"primary_label"`
-	Query          types.String            `tfsdk:"query"`
-	QueryType      types.String            `tfsdk:"query_type"`
-	Raw            *ModelCreateRaw         `tfsdk:"raw"`
-	SecondaryLabel types.String            `tfsdk:"secondary_label"`
-	Slug           types.String            `tfsdk:"slug"`
-	SourceID       types.String            `tfsdk:"source_id"`
-	SQL            types.String            `tfsdk:"sql"`
-	Syncs          []types.String          `tfsdk:"syncs"`
-	Table          *ModelCreateTable       `tfsdk:"table"`
-	Tags           map[string]types.String `tfsdk:"tags"`
-	UpdatedAt      types.String            `tfsdk:"updated_at"`
-	Visual         *ModelCreateVisual      `tfsdk:"visual"`
-	WorkspaceID    types.String            `tfsdk:"workspace_id"`
+	CreatedAt   types.String            `tfsdk:"created_at"`
+	Custom      *ModelCreateCustom      `tfsdk:"custom"`
+	Dbt         *ModelCreateDbt         `tfsdk:"dbt"`
+	Details     map[string]types.String `tfsdk:"details"`
+	ID          types.String            `tfsdk:"id"`
+	IsSchema    types.Bool              `tfsdk:"is_schema"`
+	Message     types.String            `tfsdk:"message"`
+	Name        types.String            `tfsdk:"name"`
+	PrimaryKey  types.String            `tfsdk:"primary_key"`
+	QueryType   types.String            `tfsdk:"query_type"`
+	Raw         *ModelCreateRaw         `tfsdk:"raw"`
+	Slug        types.String            `tfsdk:"slug"`
+	SourceID    types.String            `tfsdk:"source_id"`
+	Syncs       []types.String          `tfsdk:"syncs"`
+	Table       *ModelCreateTable       `tfsdk:"table"`
+	Tags        map[string]types.String `tfsdk:"tags"`
+	UpdatedAt   types.String            `tfsdk:"updated_at"`
+	Visual      *ModelCreateVisual      `tfsdk:"visual"`
+	WorkspaceID types.String            `tfsdk:"workspace_id"`
 }
 
 func (r *ModelResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -81,10 +72,10 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Description: `The timestamp when model was created`,
 			},
 			"custom": schema.SingleNestedAttribute{
-				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"query": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 						Validators: []validator.String{
 							validators.IsValidJSON(),
 						},
@@ -94,7 +85,7 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Description: `Custom query for sources that doesn't support sql. For example, Airtable.`,
 			},
 			"dbt": schema.SingleNestedAttribute{
-				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"compiled_sql": schema.StringAttribute{
 						Computed:    true,
@@ -109,7 +100,7 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Description: `Unique ID of the model assigned by dbt (usually some combination of the schema and table name)`,
 					},
 					"model_id": schema.StringAttribute{
-						Computed:    true,
+						Required:    true,
 						Description: `Model id that refer to a dbt model`,
 					},
 					"name": schema.StringAttribute{
@@ -134,13 +125,6 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					mapvalidator.ValueStringsAre(validators.IsValidJSON()),
 				},
 			},
-			"filter": schema.StringAttribute{
-				Required: true,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
-				},
-				Description: `Parsed as JSON.`,
-			},
 			"id": schema.StringAttribute{
 				Computed:    true,
 				Description: `The id of the model`,
@@ -159,47 +143,26 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 				Description: `must be one of ["Validation failed"]`,
 			},
-			"model_id": schema.StringAttribute{
-				Required:    true,
-				Description: `Model id that refers to a dbt model`,
-			},
 			"name": schema.StringAttribute{
 				Required:    true,
 				Description: `The name of the model`,
 			},
-			"parent_id": schema.StringAttribute{
-				Required:    true,
-				Description: `Parent id of the schema that visual query is based on`,
-			},
 			"primary_key": schema.StringAttribute{
 				Required:    true,
 				Description: `The primary key will be null if the query doesn't get directly synced (e.g. a relationship table for visual querying)`,
-			},
-			"primary_label": schema.StringAttribute{
-				Required: true,
-			},
-			"query": schema.StringAttribute{
-				Required: true,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
-				},
-				Description: `Parsed as JSON.`,
 			},
 			"query_type": schema.StringAttribute{
 				Required:    true,
 				Description: `The type of the query. Available options: custom, raw_sql, tabel, dbt and visual.`,
 			},
 			"raw": schema.SingleNestedAttribute{
-				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"sql": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 					},
 				},
 				Description: `Standard raw SQL query`,
-			},
-			"secondary_label": schema.StringAttribute{
-				Required: true,
 			},
 			"slug": schema.StringAttribute{
 				Required:    true,
@@ -209,19 +172,16 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Required:    true,
 				Description: `The id of the source that model is connected to`,
 			},
-			"sql": schema.StringAttribute{
-				Required: true,
-			},
 			"syncs": schema.ListAttribute{
 				Computed:    true,
 				ElementType: types.StringType,
 				Description: `The list of id of syncs that uses this model`,
 			},
 			"table": schema.SingleNestedAttribute{
-				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"name": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 					},
 				},
 				Description: `Table-based query that fetches on a table instead of SQL`,
@@ -239,24 +199,24 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Description: `The timestamp when model was lastly updated`,
 			},
 			"visual": schema.SingleNestedAttribute{
-				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"filter": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 						Validators: []validator.String{
 							validators.IsValidJSON(),
 						},
 						Description: `Parsed as JSON.`,
 					},
 					"parent_id": schema.StringAttribute{
-						Computed:    true,
+						Required:    true,
 						Description: `Parent id of the schema that visual query is based on`,
 					},
 					"primary_label": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 					},
 					"secondary_label": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 					},
 				},
 				Description: `Visual query, used by audience`,
@@ -307,68 +267,7 @@ func (r *ModelResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	var custom *shared.ModelCreateCustom
-	if data != nil {
-		var query interface{}
-		_ = json.Unmarshal([]byte(data.Query.ValueString()), &query)
-		custom = &shared.ModelCreateCustom{
-			Query: query,
-		}
-	}
-	var dbt *shared.ModelCreateDbt
-	if data != nil {
-		modelID := data.ModelID.ValueString()
-		dbt = &shared.ModelCreateDbt{
-			ModelID: modelID,
-		}
-	}
-	isSchema := data.IsSchema.ValueBool()
-	name := data.Name.ValueString()
-	primaryKey := data.PrimaryKey.ValueString()
-	queryType := data.QueryType.ValueString()
-	var raw *shared.ModelCreateRaw
-	if data != nil {
-		sql := data.SQL.ValueString()
-		raw = &shared.ModelCreateRaw{
-			SQL: sql,
-		}
-	}
-	slug := data.Slug.ValueString()
-	sourceID := data.SourceID.ValueString()
-	var table *shared.ModelCreateTable
-	if data != nil {
-		name1 := data.Name.ValueString()
-		table = &shared.ModelCreateTable{
-			Name: name1,
-		}
-	}
-	var visual *shared.ModelCreateVisual
-	if data != nil {
-		var filter interface{}
-		_ = json.Unmarshal([]byte(data.Filter.ValueString()), &filter)
-		parentID := data.ParentID.ValueString()
-		primaryLabel := data.PrimaryLabel.ValueString()
-		secondaryLabel := data.SecondaryLabel.ValueString()
-		visual = &shared.ModelCreateVisual{
-			Filter:         filter,
-			ParentID:       parentID,
-			PrimaryLabel:   primaryLabel,
-			SecondaryLabel: secondaryLabel,
-		}
-	}
-	request := shared.ModelCreate{
-		Custom:     custom,
-		Dbt:        dbt,
-		IsSchema:   isSchema,
-		Name:       name,
-		PrimaryKey: primaryKey,
-		QueryType:  queryType,
-		Raw:        raw,
-		Slug:       slug,
-		SourceID:   sourceID,
-		Table:      table,
-		Visual:     visual,
-	}
+	request := *data.ToCreateSDKType()
 	res, err := r.client.CreateModel(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -410,9 +309,9 @@ func (r *ModelResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	modelID := data.ModelID.ValueString()
+	id := data.ID.ValueString()
 	request := operations.GetModelRequest{
-		ModelID: modelID,
+		ID: id,
 	}
 	res, err := r.client.GetModel(ctx, request)
 	if err != nil {
@@ -444,81 +343,11 @@ func (r *ModelResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
-	var custom *shared.ModelUpdateCustom
-	if data != nil {
-		var query interface{}
-		_ = json.Unmarshal([]byte(data.Query.ValueString()), &query)
-		custom = &shared.ModelUpdateCustom{
-			Query: query,
-		}
-	}
-	var dbt *shared.ModelUpdateDbt
-	if data != nil {
-		modelID := data.ModelID.ValueString()
-		dbt = &shared.ModelUpdateDbt{
-			ModelID: modelID,
-		}
-	}
-	isSchema := new(bool)
-	if !data.IsSchema.IsUnknown() && !data.IsSchema.IsNull() {
-		*isSchema = data.IsSchema.ValueBool()
-	} else {
-		isSchema = nil
-	}
-	name := new(string)
-	if !data.Name.IsUnknown() && !data.Name.IsNull() {
-		*name = data.Name.ValueString()
-	} else {
-		name = nil
-	}
-	primaryKey := new(string)
-	if !data.PrimaryKey.IsUnknown() && !data.PrimaryKey.IsNull() {
-		*primaryKey = data.PrimaryKey.ValueString()
-	} else {
-		primaryKey = nil
-	}
-	var raw *shared.ModelUpdateRaw
-	if data != nil {
-		sql := data.SQL.ValueString()
-		raw = &shared.ModelUpdateRaw{
-			SQL: sql,
-		}
-	}
-	var table *shared.ModelUpdateTable
-	if data != nil {
-		name1 := data.Name.ValueString()
-		table = &shared.ModelUpdateTable{
-			Name: name1,
-		}
-	}
-	var visual *shared.ModelUpdateVisual
-	if data != nil {
-		var filter interface{}
-		_ = json.Unmarshal([]byte(data.Filter.ValueString()), &filter)
-		parentID := data.ParentID.ValueString()
-		primaryLabel := data.PrimaryLabel.ValueString()
-		secondaryLabel := data.SecondaryLabel.ValueString()
-		visual = &shared.ModelUpdateVisual{
-			Filter:         filter,
-			ParentID:       parentID,
-			PrimaryLabel:   primaryLabel,
-			SecondaryLabel: secondaryLabel,
-		}
-	}
-	modelUpdate := shared.ModelUpdate{
-		Custom:     custom,
-		Dbt:        dbt,
-		IsSchema:   isSchema,
-		Name:       name,
-		PrimaryKey: primaryKey,
-		Raw:        raw,
-		Table:      table,
-		Visual:     visual,
-	}
-	modelId1 := data.ModelID.ValueString()
+	modelUpdate := *data.ToUpdateSDKType()
+	id := data.ID.ValueString()
 	request := operations.UpdateModelRequest{
 		ModelUpdate: modelUpdate,
-		ModelID:     modelId1,
+		ID:          id,
 	}
 	res, err := r.client.UpdateModel(ctx, request)
 	if err != nil {
@@ -565,5 +394,5 @@ func (r *ModelResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 }
 
 func (r *ModelResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("model_id"), req, resp)
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

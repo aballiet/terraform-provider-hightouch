@@ -9,7 +9,7 @@ import (
 
 type GetModelRequest struct {
 	// The id of the model
-	ModelID string `pathParam:"style=simple,explode=false,name=modelId"`
+	ID string `pathParam:"style=simple,explode=false,name=id"`
 }
 
 type GetModelResponse struct {
