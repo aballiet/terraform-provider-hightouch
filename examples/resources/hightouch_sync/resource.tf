@@ -3,20 +3,16 @@ resource "hightouch_sync" "my_sync" {
         "minus" = "{ \"see\": \"documentation\" }"
         "placeat" = "{ \"see\": \"documentation\" }"
     }
-            destination_id = "...my_destinationId..."
+            destination_id = "...my_destination_id..."
             disabled = false
-            model_id = "...my_modelId..."
+            model_id = "...my_model_id..."
             schedule = {
         schedule = {
-            interval_schedule =     {
-                    interval = {
-                        quantity = 48
-                        unit = "day"
-                    }
+            cron_schedule =     {
+                    expression = "...my_expression..."
                 }
         }
         type = "...my_type..."
     }
             slug = "...my_slug..."
-            type = "...my_type..."
         }

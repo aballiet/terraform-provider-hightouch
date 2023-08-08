@@ -10,6 +10,301 @@ import (
 	"time"
 )
 
+func (r *SyncResourceModel) ToCreateSDKType() *shared.SyncCreate {
+	configuration := make(map[string]interface{})
+	// Warning. This is a map, but the source tf var is not a map. This might indicate a bug.
+	destinationID := r.DestinationID.ValueString()
+	disabled := r.Disabled.ValueBool()
+	modelID := r.ModelID.ValueString()
+	var schedule1 shared.SyncCreateScheduleSchedule
+	var intervalSchedule *shared.IntervalSchedule
+	if r.Schedule.Schedule.IntervalSchedule != nil {
+		quantity, _ := r.Schedule.Schedule.IntervalSchedule.Interval.Quantity.ValueBigFloat().Float64()
+		unit := shared.IntervalUnit(r.Schedule.Schedule.IntervalSchedule.Interval.Unit.ValueString())
+		interval := shared.Interval{
+			Quantity: quantity,
+			Unit:     unit,
+		}
+		intervalSchedule = &shared.IntervalSchedule{
+			Interval: interval,
+		}
+	}
+	if intervalSchedule != nil {
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			IntervalSchedule: intervalSchedule,
+		}
+	}
+	var cronSchedule *shared.CronSchedule
+	if r.Schedule.Schedule.CronSchedule != nil {
+		expression := r.Schedule.Schedule.CronSchedule.Expression.ValueString()
+		cronSchedule = &shared.CronSchedule{
+			Expression: expression,
+		}
+	}
+	if cronSchedule != nil {
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			CronSchedule: cronSchedule,
+		}
+	}
+	var visualCronSchedule *shared.VisualCronSchedule
+	if r.Schedule.Schedule.VisualCronSchedule != nil {
+		var expressions []shared.VisualCronScheduleExpressions = nil
+		for _, expressionsItem := range r.Schedule.Schedule.VisualCronSchedule.Expressions {
+			friday := new(bool)
+			if !expressionsItem.Days.Friday.IsUnknown() && !expressionsItem.Days.Friday.IsNull() {
+				*friday = expressionsItem.Days.Friday.ValueBool()
+			} else {
+				friday = nil
+			}
+			monday := new(bool)
+			if !expressionsItem.Days.Monday.IsUnknown() && !expressionsItem.Days.Monday.IsNull() {
+				*monday = expressionsItem.Days.Monday.ValueBool()
+			} else {
+				monday = nil
+			}
+			saturday := new(bool)
+			if !expressionsItem.Days.Saturday.IsUnknown() && !expressionsItem.Days.Saturday.IsNull() {
+				*saturday = expressionsItem.Days.Saturday.ValueBool()
+			} else {
+				saturday = nil
+			}
+			sunday := new(bool)
+			if !expressionsItem.Days.Sunday.IsUnknown() && !expressionsItem.Days.Sunday.IsNull() {
+				*sunday = expressionsItem.Days.Sunday.ValueBool()
+			} else {
+				sunday = nil
+			}
+			thursday := new(bool)
+			if !expressionsItem.Days.Thursday.IsUnknown() && !expressionsItem.Days.Thursday.IsNull() {
+				*thursday = expressionsItem.Days.Thursday.ValueBool()
+			} else {
+				thursday = nil
+			}
+			tuesday := new(bool)
+			if !expressionsItem.Days.Tuesday.IsUnknown() && !expressionsItem.Days.Tuesday.IsNull() {
+				*tuesday = expressionsItem.Days.Tuesday.ValueBool()
+			} else {
+				tuesday = nil
+			}
+			wednesday := new(bool)
+			if !expressionsItem.Days.Wednesday.IsUnknown() && !expressionsItem.Days.Wednesday.IsNull() {
+				*wednesday = expressionsItem.Days.Wednesday.ValueBool()
+			} else {
+				wednesday = nil
+			}
+			days := shared.RecordDayBooleanOrUndefined{
+				Friday:    friday,
+				Monday:    monday,
+				Saturday:  saturday,
+				Sunday:    sunday,
+				Thursday:  thursday,
+				Tuesday:   tuesday,
+				Wednesday: wednesday,
+			}
+			time := expressionsItem.Time.ValueString()
+			expressions = append(expressions, shared.VisualCronScheduleExpressions{
+				Days: days,
+				Time: time,
+			})
+		}
+		visualCronSchedule = &shared.VisualCronSchedule{
+			Expressions: expressions,
+		}
+	}
+	if visualCronSchedule != nil {
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			VisualCronSchedule: visualCronSchedule,
+		}
+	}
+	var dbtSchedule *shared.DBTSchedule
+	if r.Schedule.Schedule.DBTSchedule != nil {
+		id := r.Schedule.Schedule.DBTSchedule.Account.ID.ValueString()
+		account := shared.DBTScheduleAccount{
+			ID: id,
+		}
+		dbtCredentialID := r.Schedule.Schedule.DBTSchedule.DbtCredentialID.ValueString()
+		id1 := r.Schedule.Schedule.DBTSchedule.Job.ID.ValueString()
+		job := shared.DBTScheduleJob{
+			ID: id1,
+		}
+		dbtSchedule = &shared.DBTSchedule{
+			Account:         account,
+			DbtCredentialID: dbtCredentialID,
+			Job:             job,
+		}
+	}
+	if dbtSchedule != nil {
+		schedule1 = shared.SyncCreateScheduleSchedule{
+			DBTSchedule: dbtSchedule,
+		}
+	}
+	typeVar := r.Schedule.Type.ValueString()
+	schedule := shared.SyncCreateSchedule{
+		Schedule: schedule1,
+		Type:     typeVar,
+	}
+	slug := r.Slug.ValueString()
+	out := shared.SyncCreate{
+		Configuration: configuration,
+		DestinationID: destinationID,
+		Disabled:      disabled,
+		ModelID:       modelID,
+		Schedule:      schedule,
+		Slug:          slug,
+	}
+	return &out
+}
+
+func (r *SyncResourceModel) ToGetSDKType() *shared.SyncCreate {
+	out := r.ToCreateSDKType()
+	return out
+}
+
+func (r *SyncResourceModel) ToUpdateSDKType() *shared.SyncUpdate {
+	configuration := make(map[string]interface{})
+	// Warning. This is a map, but the source tf var is not a map. This might indicate a bug.
+	disabled := new(bool)
+	if !r.Disabled.IsUnknown() && !r.Disabled.IsNull() {
+		*disabled = r.Disabled.ValueBool()
+	} else {
+		disabled = nil
+	}
+	var schedule *shared.SyncUpdateSchedule
+	var schedule1 shared.SyncUpdateScheduleSchedule
+	var intervalSchedule *shared.IntervalSchedule
+	if r.Schedule.Schedule.IntervalSchedule != nil {
+		quantity, _ := r.Schedule.Schedule.IntervalSchedule.Interval.Quantity.ValueBigFloat().Float64()
+		unit := shared.IntervalUnit(r.Schedule.Schedule.IntervalSchedule.Interval.Unit.ValueString())
+		interval := shared.Interval{
+			Quantity: quantity,
+			Unit:     unit,
+		}
+		intervalSchedule = &shared.IntervalSchedule{
+			Interval: interval,
+		}
+	}
+	if intervalSchedule != nil {
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			IntervalSchedule: intervalSchedule,
+		}
+	}
+	var cronSchedule *shared.CronSchedule
+	if r.Schedule.Schedule.CronSchedule != nil {
+		expression := r.Schedule.Schedule.CronSchedule.Expression.ValueString()
+		cronSchedule = &shared.CronSchedule{
+			Expression: expression,
+		}
+	}
+	if cronSchedule != nil {
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			CronSchedule: cronSchedule,
+		}
+	}
+	var visualCronSchedule *shared.VisualCronSchedule
+	if r.Schedule.Schedule.VisualCronSchedule != nil {
+		var expressions []shared.VisualCronScheduleExpressions = nil
+		for _, expressionsItem := range r.Schedule.Schedule.VisualCronSchedule.Expressions {
+			friday := new(bool)
+			if !expressionsItem.Days.Friday.IsUnknown() && !expressionsItem.Days.Friday.IsNull() {
+				*friday = expressionsItem.Days.Friday.ValueBool()
+			} else {
+				friday = nil
+			}
+			monday := new(bool)
+			if !expressionsItem.Days.Monday.IsUnknown() && !expressionsItem.Days.Monday.IsNull() {
+				*monday = expressionsItem.Days.Monday.ValueBool()
+			} else {
+				monday = nil
+			}
+			saturday := new(bool)
+			if !expressionsItem.Days.Saturday.IsUnknown() && !expressionsItem.Days.Saturday.IsNull() {
+				*saturday = expressionsItem.Days.Saturday.ValueBool()
+			} else {
+				saturday = nil
+			}
+			sunday := new(bool)
+			if !expressionsItem.Days.Sunday.IsUnknown() && !expressionsItem.Days.Sunday.IsNull() {
+				*sunday = expressionsItem.Days.Sunday.ValueBool()
+			} else {
+				sunday = nil
+			}
+			thursday := new(bool)
+			if !expressionsItem.Days.Thursday.IsUnknown() && !expressionsItem.Days.Thursday.IsNull() {
+				*thursday = expressionsItem.Days.Thursday.ValueBool()
+			} else {
+				thursday = nil
+			}
+			tuesday := new(bool)
+			if !expressionsItem.Days.Tuesday.IsUnknown() && !expressionsItem.Days.Tuesday.IsNull() {
+				*tuesday = expressionsItem.Days.Tuesday.ValueBool()
+			} else {
+				tuesday = nil
+			}
+			wednesday := new(bool)
+			if !expressionsItem.Days.Wednesday.IsUnknown() && !expressionsItem.Days.Wednesday.IsNull() {
+				*wednesday = expressionsItem.Days.Wednesday.ValueBool()
+			} else {
+				wednesday = nil
+			}
+			days := shared.RecordDayBooleanOrUndefined{
+				Friday:    friday,
+				Monday:    monday,
+				Saturday:  saturday,
+				Sunday:    sunday,
+				Thursday:  thursday,
+				Tuesday:   tuesday,
+				Wednesday: wednesday,
+			}
+			time := expressionsItem.Time.ValueString()
+			expressions = append(expressions, shared.VisualCronScheduleExpressions{
+				Days: days,
+				Time: time,
+			})
+		}
+		visualCronSchedule = &shared.VisualCronSchedule{
+			Expressions: expressions,
+		}
+	}
+	if visualCronSchedule != nil {
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			VisualCronSchedule: visualCronSchedule,
+		}
+	}
+	var dbtSchedule *shared.DBTSchedule
+	if r.Schedule.Schedule.DBTSchedule != nil {
+		id := r.Schedule.Schedule.DBTSchedule.Account.ID.ValueString()
+		account := shared.DBTScheduleAccount{
+			ID: id,
+		}
+		dbtCredentialID := r.Schedule.Schedule.DBTSchedule.DbtCredentialID.ValueString()
+		id1 := r.Schedule.Schedule.DBTSchedule.Job.ID.ValueString()
+		job := shared.DBTScheduleJob{
+			ID: id1,
+		}
+		dbtSchedule = &shared.DBTSchedule{
+			Account:         account,
+			DbtCredentialID: dbtCredentialID,
+			Job:             job,
+		}
+	}
+	if dbtSchedule != nil {
+		schedule1 = shared.SyncUpdateScheduleSchedule{
+			DBTSchedule: dbtSchedule,
+		}
+	}
+	typeVar := r.Schedule.Type.ValueString()
+	schedule = &shared.SyncUpdateSchedule{
+		Schedule: schedule1,
+		Type:     typeVar,
+	}
+	out := shared.SyncUpdate{
+		Configuration: configuration,
+		Disabled:      disabled,
+		Schedule:      schedule,
+	}
+	return &out
+}
+
 func (r *SyncResourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 	if r.Configuration == nil && len(resp.Configuration) > 0 {
 		r.Configuration = make(map[string]types.String)
@@ -29,14 +324,20 @@ func (r *SyncResourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 	for _, v := range resp.ReferencedColumns {
 		r.ReferencedColumns = append(r.ReferencedColumns, types.StringValue(v))
 	}
+	if resp.Schedule.Schedule.CronSchedule != nil {
+		r.Schedule.Schedule.CronSchedule = &CronSchedule{}
+		r.Schedule.Schedule.CronSchedule.Expression = types.StringValue(resp.Schedule.Schedule.CronSchedule.Expression)
+	}
+	if resp.Schedule.Schedule.DBTSchedule != nil {
+		r.Schedule.Schedule.DBTSchedule = &DBTSchedule{}
+		r.Schedule.Schedule.DBTSchedule.Account.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Account.ID)
+		r.Schedule.Schedule.DBTSchedule.DbtCredentialID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.DbtCredentialID)
+		r.Schedule.Schedule.DBTSchedule.Job.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Job.ID)
+	}
 	if resp.Schedule.Schedule.IntervalSchedule != nil {
 		r.Schedule.Schedule.IntervalSchedule = &IntervalSchedule{}
 		r.Schedule.Schedule.IntervalSchedule.Interval.Quantity = types.NumberValue(big.NewFloat(float64(resp.Schedule.Schedule.IntervalSchedule.Interval.Quantity)))
 		r.Schedule.Schedule.IntervalSchedule.Interval.Unit = types.StringValue(string(resp.Schedule.Schedule.IntervalSchedule.Interval.Unit))
-	}
-	if resp.Schedule.Schedule.CronSchedule != nil {
-		r.Schedule.Schedule.CronSchedule = &CronSchedule{}
-		r.Schedule.Schedule.CronSchedule.Expression = types.StringValue(resp.Schedule.Schedule.CronSchedule.Expression)
 	}
 	if resp.Schedule.Schedule.VisualCronSchedule != nil {
 		r.Schedule.Schedule.VisualCronSchedule = &VisualCronSchedule{}
@@ -81,12 +382,6 @@ func (r *SyncResourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 			expressions1.Time = types.StringValue(expressionsItem.Time)
 			r.Schedule.Schedule.VisualCronSchedule.Expressions = append(r.Schedule.Schedule.VisualCronSchedule.Expressions, expressions1)
 		}
-	}
-	if resp.Schedule.Schedule.DBTSchedule != nil {
-		r.Schedule.Schedule.DBTSchedule = &DBTSchedule{}
-		r.Schedule.Schedule.DBTSchedule.Account.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Account.ID)
-		r.Schedule.Schedule.DBTSchedule.DbtCredentialID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.DbtCredentialID)
-		r.Schedule.Schedule.DBTSchedule.Job.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Job.ID)
 	}
 	r.Schedule.Type = types.StringValue(resp.Schedule.Type)
 	r.Slug = types.StringValue(resp.Slug)

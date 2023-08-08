@@ -12,6 +12,12 @@ generation:
   sdkClassName: hightouch
   singleTagPerOp: false
   tagNamespacingDisabled: false
+features:
+  terraform:
+    core: 2.83.0
+    globalSecurity: 2.81.1
+    globalServerURLs: 2.81.1
+    includes: 2.81.1
 terraform:
   version: 0.0.1
   author: aballiet

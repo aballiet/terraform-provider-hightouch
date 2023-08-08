@@ -29,14 +29,20 @@ func (r *SyncDataSourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 	for _, v := range resp.ReferencedColumns {
 		r.ReferencedColumns = append(r.ReferencedColumns, types.StringValue(v))
 	}
+	if resp.Schedule.Schedule.CronSchedule != nil {
+		r.Schedule.Schedule.CronSchedule = &CronSchedule{}
+		r.Schedule.Schedule.CronSchedule.Expression = types.StringValue(resp.Schedule.Schedule.CronSchedule.Expression)
+	}
+	if resp.Schedule.Schedule.DBTSchedule != nil {
+		r.Schedule.Schedule.DBTSchedule = &DBTSchedule{}
+		r.Schedule.Schedule.DBTSchedule.Account.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Account.ID)
+		r.Schedule.Schedule.DBTSchedule.DbtCredentialID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.DbtCredentialID)
+		r.Schedule.Schedule.DBTSchedule.Job.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Job.ID)
+	}
 	if resp.Schedule.Schedule.IntervalSchedule != nil {
 		r.Schedule.Schedule.IntervalSchedule = &IntervalSchedule{}
 		r.Schedule.Schedule.IntervalSchedule.Interval.Quantity = types.NumberValue(big.NewFloat(float64(resp.Schedule.Schedule.IntervalSchedule.Interval.Quantity)))
 		r.Schedule.Schedule.IntervalSchedule.Interval.Unit = types.StringValue(string(resp.Schedule.Schedule.IntervalSchedule.Interval.Unit))
-	}
-	if resp.Schedule.Schedule.CronSchedule != nil {
-		r.Schedule.Schedule.CronSchedule = &CronSchedule{}
-		r.Schedule.Schedule.CronSchedule.Expression = types.StringValue(resp.Schedule.Schedule.CronSchedule.Expression)
 	}
 	if resp.Schedule.Schedule.VisualCronSchedule != nil {
 		r.Schedule.Schedule.VisualCronSchedule = &VisualCronSchedule{}
@@ -81,12 +87,6 @@ func (r *SyncDataSourceModel) RefreshFromGetResponse(resp *shared.Sync) {
 			expressions1.Time = types.StringValue(expressionsItem.Time)
 			r.Schedule.Schedule.VisualCronSchedule.Expressions = append(r.Schedule.Schedule.VisualCronSchedule.Expressions, expressions1)
 		}
-	}
-	if resp.Schedule.Schedule.DBTSchedule != nil {
-		r.Schedule.Schedule.DBTSchedule = &DBTSchedule{}
-		r.Schedule.Schedule.DBTSchedule.Account.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Account.ID)
-		r.Schedule.Schedule.DBTSchedule.DbtCredentialID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.DbtCredentialID)
-		r.Schedule.Schedule.DBTSchedule.Job.ID = types.StringValue(resp.Schedule.Schedule.DBTSchedule.Job.ID)
 	}
 	r.Schedule.Type = types.StringValue(resp.Schedule.Type)
 	r.Slug = types.StringValue(resp.Slug)

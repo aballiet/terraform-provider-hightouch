@@ -1,3 +1,3 @@
 data "hightouch_destination" "my_destination" {
-    id = "6ed151a0-5dfc-42dd-b7cc-78ca1ba928fc"
+    id = "796ed151-a05d-4fc2-9df7-cc78ca1ba928"
         }

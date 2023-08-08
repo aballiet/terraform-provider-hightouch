@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"hightouch/internal/sdk"
-	"hightouch/internal/sdk/pkg/models/shared"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -49,7 +48,6 @@ type SyncResourceModel struct {
 	Schedule          SyncCreateSchedule      `tfsdk:"schedule"`
 	Slug              types.String            `tfsdk:"slug"`
 	Status            types.String            `tfsdk:"status"`
-	Type              types.String            `tfsdk:"type"`
 	UpdatedAt         types.String            `tfsdk:"updated_at"`
 	WorkspaceID       types.String            `tfsdk:"workspace_id"`
 }
@@ -117,7 +115,7 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 						"Validation failed",
 					),
 				},
-				Description: `must be one of [Validation failed]`,
+				Description: `must be one of ["Validation failed"]`,
 			},
 			"model_id": schema.StringAttribute{
 				Required:    true,
@@ -136,19 +134,51 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"schedule": schema.SingleNestedAttribute{
-						Computed: true,
+						Required: true,
 						Attributes: map[string]schema.Attribute{
+							"cron_schedule": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"expression": schema.StringAttribute{
+										Required: true,
+									},
+								},
+							},
+							"dbt_schedule": schema.SingleNestedAttribute{
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"account": schema.SingleNestedAttribute{
+										Required: true,
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Required: true,
+											},
+										},
+									},
+									"dbt_credential_id": schema.StringAttribute{
+										Required: true,
+									},
+									"job": schema.SingleNestedAttribute{
+										Required: true,
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Required: true,
+											},
+										},
+									},
+								},
+							},
 							"interval_schedule": schema.SingleNestedAttribute{
-								Computed: true,
+								Optional: true,
 								Attributes: map[string]schema.Attribute{
 									"interval": schema.SingleNestedAttribute{
-										Computed: true,
+										Required: true,
 										Attributes: map[string]schema.Attribute{
 											"quantity": schema.NumberAttribute{
-												Computed: true,
+												Required: true,
 											},
 											"unit": schema.StringAttribute{
-												Computed: true,
+												Required: true,
 												Validators: []validator.String{
 													stringvalidator.OneOf(
 														"minute",
@@ -157,81 +187,49 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 														"week",
 													),
 												},
-												Description: `must be one of [minute, hour, day, week]`,
+												Description: `must be one of ["minute", "hour", "day", "week"]`,
 											},
 										},
 									},
 								},
 							},
-							"cron_schedule": schema.SingleNestedAttribute{
-								Computed: true,
-								Attributes: map[string]schema.Attribute{
-									"expression": schema.StringAttribute{
-										Computed: true,
-									},
-								},
-							},
 							"visual_cron_schedule": schema.SingleNestedAttribute{
-								Computed: true,
+								Optional: true,
 								Attributes: map[string]schema.Attribute{
 									"expressions": schema.ListNestedAttribute{
-										Computed: true,
+										Required: true,
 										NestedObject: schema.NestedAttributeObject{
 											Attributes: map[string]schema.Attribute{
 												"days": schema.SingleNestedAttribute{
-													Computed: true,
+													Required: true,
 													Attributes: map[string]schema.Attribute{
 														"friday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 														"monday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 														"saturday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 														"sunday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 														"thursday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 														"tuesday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 														"wednesday": schema.BoolAttribute{
-															Computed: true,
+															Optional: true,
 														},
 													},
 													Description: `Construct a type with a set of properties K of type T`,
 												},
 												"time": schema.StringAttribute{
-													Computed: true,
+													Required: true,
 												},
-											},
-										},
-									},
-								},
-							},
-							"dbt_schedule": schema.SingleNestedAttribute{
-								Computed: true,
-								Attributes: map[string]schema.Attribute{
-									"account": schema.SingleNestedAttribute{
-										Computed: true,
-										Attributes: map[string]schema.Attribute{
-											"id": schema.StringAttribute{
-												Computed: true,
-											},
-										},
-									},
-									"dbt_credential_id": schema.StringAttribute{
-										Computed: true,
-									},
-									"job": schema.SingleNestedAttribute{
-										Computed: true,
-										Attributes: map[string]schema.Attribute{
-											"id": schema.StringAttribute{
-												Computed: true,
 											},
 										},
 									},
@@ -243,7 +241,7 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 						},
 					},
 					"type": schema.StringAttribute{
-						Computed: true,
+						Required: true,
 					},
 				},
 				MarkdownDescription: `The scheduling configuration. It can be triggerd based on several ways:` + "\n" +
@@ -277,11 +275,8 @@ func (r *SyncResource) Schema(ctx context.Context, req resource.SchemaRequest, r
 						"interrupted",
 					),
 				},
-				MarkdownDescription: `must be one of [disabled, pending, cancelled, failed, queued, success, warning, querying, processing, reporting, interrupted]` + "\n" +
+				MarkdownDescription: `must be one of ["disabled", "pending", "cancelled", "failed", "queued", "success", "warning", "querying", "processing", "reporting", "interrupted"]` + "\n" +
 					`SyncStatus`,
-			},
-			"type": schema.StringAttribute{
-				Required: true,
 			},
 			"updated_at": schema.StringAttribute{
 				Computed: true,
@@ -336,147 +331,7 @@ func (r *SyncResource) Create(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	configuration := make(map[string]interface{})
-	// Warning. This is a map, but the source tf var is not a map. This might indicate a bug.
-	destinationID := data.DestinationID.ValueString()
-	disabled := data.Disabled.ValueBool()
-	modelID := data.ModelID.ValueString()
-	var schedule1 shared.SyncCreateScheduleSchedule
-	var intervalSchedule *shared.IntervalSchedule
-	if data.Schedule != nil {
-		quantity, _ := data.Schedule.Quantity.ValueBigFloat().Float64()
-		unit := shared.IntervalUnit(data.Schedule.Unit.ValueString())
-		interval := shared.Interval{
-			Quantity: quantity,
-			Unit:     unit,
-		}
-		intervalSchedule = &shared.IntervalSchedule{
-			Interval: interval,
-		}
-	}
-	if intervalSchedule != nil {
-		schedule1 = shared.SyncCreateScheduleSchedule{
-			IntervalSchedule: intervalSchedule,
-		}
-	}
-	var cronSchedule *shared.CronSchedule
-	if data.Schedule != nil {
-		expression := data.Schedule.Expression.ValueString()
-		cronSchedule = &shared.CronSchedule{
-			Expression: expression,
-		}
-	}
-	if cronSchedule != nil {
-		schedule1 = shared.SyncCreateScheduleSchedule{
-			CronSchedule: cronSchedule,
-		}
-	}
-	var visualCronSchedule *shared.VisualCronSchedule
-	if data.Schedule != nil {
-		var expressions []shared.VisualCronScheduleExpressions = nil
-		for _, expressionsItem := range data.Schedule.Expressions {
-			friday := new(bool)
-			if !expressionsItem.Friday.IsUnknown() && !expressionsItem.Friday.IsNull() {
-				*friday = expressionsItem.Friday.ValueBool()
-			} else {
-				friday = nil
-			}
-			monday := new(bool)
-			if !expressionsItem.Monday.IsUnknown() && !expressionsItem.Monday.IsNull() {
-				*monday = expressionsItem.Monday.ValueBool()
-			} else {
-				monday = nil
-			}
-			saturday := new(bool)
-			if !expressionsItem.Saturday.IsUnknown() && !expressionsItem.Saturday.IsNull() {
-				*saturday = expressionsItem.Saturday.ValueBool()
-			} else {
-				saturday = nil
-			}
-			sunday := new(bool)
-			if !expressionsItem.Sunday.IsUnknown() && !expressionsItem.Sunday.IsNull() {
-				*sunday = expressionsItem.Sunday.ValueBool()
-			} else {
-				sunday = nil
-			}
-			thursday := new(bool)
-			if !expressionsItem.Thursday.IsUnknown() && !expressionsItem.Thursday.IsNull() {
-				*thursday = expressionsItem.Thursday.ValueBool()
-			} else {
-				thursday = nil
-			}
-			tuesday := new(bool)
-			if !expressionsItem.Tuesday.IsUnknown() && !expressionsItem.Tuesday.IsNull() {
-				*tuesday = expressionsItem.Tuesday.ValueBool()
-			} else {
-				tuesday = nil
-			}
-			wednesday := new(bool)
-			if !expressionsItem.Wednesday.IsUnknown() && !expressionsItem.Wednesday.IsNull() {
-				*wednesday = expressionsItem.Wednesday.ValueBool()
-			} else {
-				wednesday = nil
-			}
-			days := shared.RecordDayBooleanOrUndefined{
-				Friday:    friday,
-				Monday:    monday,
-				Saturday:  saturday,
-				Sunday:    sunday,
-				Thursday:  thursday,
-				Tuesday:   tuesday,
-				Wednesday: wednesday,
-			}
-			time := expressionsItem.Time.ValueString()
-			expressions = append(expressions, shared.VisualCronScheduleExpressions{
-				Days: days,
-				Time: time,
-			})
-		}
-		visualCronSchedule = &shared.VisualCronSchedule{
-			Expressions: expressions,
-		}
-	}
-	if visualCronSchedule != nil {
-		schedule1 = shared.SyncCreateScheduleSchedule{
-			VisualCronSchedule: visualCronSchedule,
-		}
-	}
-	var dbtSchedule *shared.DBTSchedule
-	if data.Schedule != nil {
-		id := data.Schedule.ID.ValueString()
-		account := shared.DBTScheduleAccount{
-			ID: id,
-		}
-		dbtCredentialID := data.Schedule.DbtCredentialID.ValueString()
-		id1 := data.Schedule.ID.ValueString()
-		job := shared.DBTScheduleJob{
-			ID: id1,
-		}
-		dbtSchedule = &shared.DBTSchedule{
-			Account:         account,
-			DbtCredentialID: dbtCredentialID,
-			Job:             job,
-		}
-	}
-	if dbtSchedule != nil {
-		schedule1 = shared.SyncCreateScheduleSchedule{
-			DBTSchedule: dbtSchedule,
-		}
-	}
-	type1 := data.Type.ValueString()
-	schedule := shared.SyncCreateSchedule{
-		Schedule: schedule1,
-		Type:     type1,
-	}
-	slug := data.Slug.ValueString()
-	request := shared.SyncCreate{
-		Configuration: configuration,
-		DestinationID: destinationID,
-		Disabled:      disabled,
-		ModelID:       modelID,
-		Schedule:      schedule,
-		Slug:          slug,
-	}
+	request := *data.ToCreateSDKType()
 	res, err := r.client.CreateSync(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -552,151 +407,11 @@ func (r *SyncResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
-	configuration := make(map[string]interface{})
-	// Warning. This is a map, but the source tf var is not a map. This might indicate a bug.
-	disabled := new(bool)
-	if !data.Disabled.IsUnknown() && !data.Disabled.IsNull() {
-		*disabled = data.Disabled.ValueBool()
-	} else {
-		disabled = nil
-	}
-	var schedule *shared.SyncUpdateSchedule
-	var schedule1 shared.SyncUpdateScheduleSchedule
-	var intervalSchedule *shared.IntervalSchedule
-	if data.Schedule != nil {
-		quantity, _ := data.Schedule.Quantity.ValueBigFloat().Float64()
-		unit := shared.IntervalUnit(data.Schedule.Unit.ValueString())
-		interval := shared.Interval{
-			Quantity: quantity,
-			Unit:     unit,
-		}
-		intervalSchedule = &shared.IntervalSchedule{
-			Interval: interval,
-		}
-	}
-	if intervalSchedule != nil {
-		schedule1 = shared.SyncUpdateScheduleSchedule{
-			IntervalSchedule: intervalSchedule,
-		}
-	}
-	var cronSchedule *shared.CronSchedule
-	if data.Schedule != nil {
-		expression := data.Schedule.Expression.ValueString()
-		cronSchedule = &shared.CronSchedule{
-			Expression: expression,
-		}
-	}
-	if cronSchedule != nil {
-		schedule1 = shared.SyncUpdateScheduleSchedule{
-			CronSchedule: cronSchedule,
-		}
-	}
-	var visualCronSchedule *shared.VisualCronSchedule
-	if data.Schedule != nil {
-		var expressions []shared.VisualCronScheduleExpressions = nil
-		for _, expressionsItem := range data.Schedule.Expressions {
-			friday := new(bool)
-			if !expressionsItem.Friday.IsUnknown() && !expressionsItem.Friday.IsNull() {
-				*friday = expressionsItem.Friday.ValueBool()
-			} else {
-				friday = nil
-			}
-			monday := new(bool)
-			if !expressionsItem.Monday.IsUnknown() && !expressionsItem.Monday.IsNull() {
-				*monday = expressionsItem.Monday.ValueBool()
-			} else {
-				monday = nil
-			}
-			saturday := new(bool)
-			if !expressionsItem.Saturday.IsUnknown() && !expressionsItem.Saturday.IsNull() {
-				*saturday = expressionsItem.Saturday.ValueBool()
-			} else {
-				saturday = nil
-			}
-			sunday := new(bool)
-			if !expressionsItem.Sunday.IsUnknown() && !expressionsItem.Sunday.IsNull() {
-				*sunday = expressionsItem.Sunday.ValueBool()
-			} else {
-				sunday = nil
-			}
-			thursday := new(bool)
-			if !expressionsItem.Thursday.IsUnknown() && !expressionsItem.Thursday.IsNull() {
-				*thursday = expressionsItem.Thursday.ValueBool()
-			} else {
-				thursday = nil
-			}
-			tuesday := new(bool)
-			if !expressionsItem.Tuesday.IsUnknown() && !expressionsItem.Tuesday.IsNull() {
-				*tuesday = expressionsItem.Tuesday.ValueBool()
-			} else {
-				tuesday = nil
-			}
-			wednesday := new(bool)
-			if !expressionsItem.Wednesday.IsUnknown() && !expressionsItem.Wednesday.IsNull() {
-				*wednesday = expressionsItem.Wednesday.ValueBool()
-			} else {
-				wednesday = nil
-			}
-			days := shared.RecordDayBooleanOrUndefined{
-				Friday:    friday,
-				Monday:    monday,
-				Saturday:  saturday,
-				Sunday:    sunday,
-				Thursday:  thursday,
-				Tuesday:   tuesday,
-				Wednesday: wednesday,
-			}
-			time := expressionsItem.Time.ValueString()
-			expressions = append(expressions, shared.VisualCronScheduleExpressions{
-				Days: days,
-				Time: time,
-			})
-		}
-		visualCronSchedule = &shared.VisualCronSchedule{
-			Expressions: expressions,
-		}
-	}
-	if visualCronSchedule != nil {
-		schedule1 = shared.SyncUpdateScheduleSchedule{
-			VisualCronSchedule: visualCronSchedule,
-		}
-	}
-	var dbtSchedule *shared.DBTSchedule
-	if data.Schedule != nil {
-		id := data.Schedule.ID.ValueString()
-		account := shared.DBTScheduleAccount{
-			ID: id,
-		}
-		dbtCredentialID := data.Schedule.DbtCredentialID.ValueString()
-		id1 := data.Schedule.ID.ValueString()
-		job := shared.DBTScheduleJob{
-			ID: id1,
-		}
-		dbtSchedule = &shared.DBTSchedule{
-			Account:         account,
-			DbtCredentialID: dbtCredentialID,
-			Job:             job,
-		}
-	}
-	if dbtSchedule != nil {
-		schedule1 = shared.SyncUpdateScheduleSchedule{
-			DBTSchedule: dbtSchedule,
-		}
-	}
-	type1 := data.Type.ValueString()
-	schedule = &shared.SyncUpdateSchedule{
-		Schedule: schedule1,
-		Type:     type1,
-	}
-	syncUpdate := shared.SyncUpdate{
-		Configuration: configuration,
-		Disabled:      disabled,
-		Schedule:      schedule,
-	}
-	id2 := data.ID.ValueString()
+	syncUpdate := *data.ToUpdateSDKType()
+	id := data.ID.ValueString()
 	request := operations.UpdateSyncRequest{
 		SyncUpdate: syncUpdate,
-		ID:         id2,
+		ID:         id,
 	}
 	res, err := r.client.UpdateSync(ctx, request)
 	if err != nil {

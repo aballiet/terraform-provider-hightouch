@@ -96,7 +96,7 @@ func (r *DestinationResource) Schema(ctx context.Context, req resource.SchemaReq
 						"Validation failed",
 					),
 				},
-				Description: `must be one of [Validation failed]`,
+				Description: `must be one of ["Validation failed"]`,
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
@@ -172,12 +172,12 @@ func (r *DestinationResource) Create(ctx context.Context, req resource.CreateReq
 	// Warning. This is a map, but the source tf var is not a map. This might indicate a bug.
 	name := data.Name.ValueString()
 	slug := data.Slug.ValueString()
-	type1 := data.Type.ValueString()
+	typeVar := data.Type.ValueString()
 	request := shared.DestinationCreate{
 		Configuration: configuration,
 		Name:          name,
 		Slug:          slug,
-		Type:          type1,
+		Type:          typeVar,
 	}
 	res, err := r.client.CreateDestination(ctx, request)
 	if err != nil {

@@ -119,6 +119,38 @@ func (r *SyncDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 					"schedule": schema.SingleNestedAttribute{
 						Computed: true,
 						Attributes: map[string]schema.Attribute{
+							"cron_schedule": schema.SingleNestedAttribute{
+								Computed: true,
+								Attributes: map[string]schema.Attribute{
+									"expression": schema.StringAttribute{
+										Computed: true,
+									},
+								},
+							},
+							"dbt_schedule": schema.SingleNestedAttribute{
+								Computed: true,
+								Attributes: map[string]schema.Attribute{
+									"account": schema.SingleNestedAttribute{
+										Computed: true,
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Computed: true,
+											},
+										},
+									},
+									"dbt_credential_id": schema.StringAttribute{
+										Computed: true,
+									},
+									"job": schema.SingleNestedAttribute{
+										Computed: true,
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Computed: true,
+											},
+										},
+									},
+								},
+							},
 							"interval_schedule": schema.SingleNestedAttribute{
 								Computed: true,
 								Attributes: map[string]schema.Attribute{
@@ -138,17 +170,9 @@ func (r *SyncDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 														"week",
 													),
 												},
-												Description: `must be one of [minute, hour, day, week]`,
+												Description: `must be one of ["minute", "hour", "day", "week"]`,
 											},
 										},
-									},
-								},
-							},
-							"cron_schedule": schema.SingleNestedAttribute{
-								Computed: true,
-								Attributes: map[string]schema.Attribute{
-									"expression": schema.StringAttribute{
-										Computed: true,
 									},
 								},
 							},
@@ -194,30 +218,6 @@ func (r *SyncDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 									},
 								},
 							},
-							"dbt_schedule": schema.SingleNestedAttribute{
-								Computed: true,
-								Attributes: map[string]schema.Attribute{
-									"account": schema.SingleNestedAttribute{
-										Computed: true,
-										Attributes: map[string]schema.Attribute{
-											"id": schema.StringAttribute{
-												Computed: true,
-											},
-										},
-									},
-									"dbt_credential_id": schema.StringAttribute{
-										Computed: true,
-									},
-									"job": schema.SingleNestedAttribute{
-										Computed: true,
-										Attributes: map[string]schema.Attribute{
-											"id": schema.StringAttribute{
-												Computed: true,
-											},
-										},
-									},
-								},
-							},
 						},
 						Validators: []validator.Object{
 							validators.ExactlyOneChild(),
@@ -258,7 +258,7 @@ func (r *SyncDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 						"interrupted",
 					),
 				},
-				MarkdownDescription: `must be one of [disabled, pending, cancelled, failed, queued, success, warning, querying, processing, reporting, interrupted]` + "\n" +
+				MarkdownDescription: `must be one of ["disabled", "pending", "cancelled", "failed", "queued", "success", "warning", "querying", "processing", "reporting", "interrupted"]` + "\n" +
 					`SyncStatus`,
 			},
 			"updated_at": schema.StringAttribute{

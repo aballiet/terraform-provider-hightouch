@@ -157,7 +157,7 @@ func (r *ModelResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						"Validation failed",
 					),
 				},
-				Description: `must be one of [Validation failed]`,
+				Description: `must be one of ["Validation failed"]`,
 			},
 			"model_id": schema.StringAttribute{
 				Required:    true,

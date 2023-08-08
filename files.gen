@@ -4,14 +4,14 @@ internal/provider/type_model_create_dbt.go
 internal/provider/type_model_create_raw.go
 internal/provider/type_model_create_table.go
 internal/provider/type_model_create_visual.go
+internal/provider/type_cron_schedule.go
+internal/provider/type_dbt_schedule_account.go
+internal/provider/type_dbt_schedule.go
 internal/provider/type_interval.go
 internal/provider/type_interval_schedule.go
-internal/provider/type_cron_schedule.go
 internal/provider/type_record_day_boolean_or_undefined.go
 internal/provider/type_visual_cron_schedule_expressions.go
 internal/provider/type_visual_cron_schedule.go
-internal/provider/type_dbt_schedule_account.go
-internal/provider/type_dbt_schedule.go
 internal/provider/type_sync_create_schedule_schedule.go
 internal/provider/type_sync_create_schedule.go
 examples/README.md
